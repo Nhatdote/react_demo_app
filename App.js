@@ -1,21 +1,28 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react'
+import {StyleSheet} from 'react-native'
+import {NavigationContainer} from "@react-navigation/native"
+import Axios from 'axios'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+import AppNavigator from "./AppNavigator"
+
+Axios.defaults.baseURL = 'http://192.168.3.28';
+
+export default class App extends React.Component {
+    render() {
+        return (
+            <NavigationContainer>
+                <AppNavigator />
+            </NavigationContainer>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1,
+        alignItems: 'stretch',
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        paddingHorizontal: 15
+    }
 });
