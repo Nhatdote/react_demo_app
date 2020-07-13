@@ -26,7 +26,7 @@ const ProductDetail = (props) => {
                     <View style={styles.info}>
                         <Text>Thương hiệu: <Text style={styles.textSecondary}>{product.brand}</Text></Text>
                         <Text>Nhà cung cấp: <Text style={styles.textSecondary}>{product.vendor}</Text></Text>
-                        <Text>Danh mục: <Text style={styles.textSecondary}>{product.category_name}</Text></Text>
+                        <Text>Danh mục: <Text style={styles.textSecondary}>{product.child_category.name ? product.child_category.name : 'Chưa phân loại'}</Text></Text>
                         <Text style={styles.price}>{numberFormat(product.sale_price * product.rate) + ' đ'}</Text>
                     </View>
                 </View>

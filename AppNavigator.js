@@ -120,10 +120,12 @@ const AppNavigator = () => {
                         }
                         return (
                             <CartContext.Consumer>
-                                { ({cart}) => {
-                                    return (
-                                        <HomeIconWithBadge name={iconName} size={size} color={color} badge={iconName === 'shoppingcart' ? cart.length : ''}/>
-                                    );
+                                { ({total}) => {
+                                    if (iconName === 'shoppingcart') {
+                                        return <HomeIconWithBadge name={iconName} size={size} color={color} badge={total}/>
+                                    }else{
+                                        return <HomeIconWithBadge name={iconName} size={size} color={color}/>
+                                    }
                                 }}
                             </CartContext.Consumer>
                         );

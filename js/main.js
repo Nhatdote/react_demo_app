@@ -29,8 +29,4 @@ function numberFormat(number, decimals, dec_point, thousands_point) {
     return number;
 }
 
-function test() {
-    return 124
-}
-
-export {numberFormat, test};
+export {numberFormat};
