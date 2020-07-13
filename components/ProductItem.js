@@ -1,6 +1,6 @@
 import React from 'react'
 import {StyleSheet, View, Text, Image, TouchableOpacity, Alert} from 'react-native'
-import numberFormat from '../js/main'
+import {numberFormat} from '../js/main'
 
 export default function ProductItem(props) {
     const { product, onPress } = props;

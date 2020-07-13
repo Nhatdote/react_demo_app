@@ -2,7 +2,7 @@ import React from 'react'
 import {Text, SafeAreaView, StyleSheet, Image, View, Button, Alert} from 'react-native'
 import Axios from "axios";
 
-import numberFormat from "../js/main";
+import {numberFormat} from "../js/main";
 import Color from "../components/Color"
 import {CartContext} from "../contexts/Cart";
 

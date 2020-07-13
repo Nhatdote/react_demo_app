@@ -1,7 +1,7 @@
 import React from 'react'
 import {StyleSheet, View, Text, Image, TouchableOpacity, Alert} from 'react-native'
 
-import numberFormat from '../js/main'
+import {numberFormat} from '../js/main'
 import Color from "./Color";
 
 export default function CartItem(props) {

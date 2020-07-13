@@ -19,7 +19,7 @@ export default class Categories extends React.Component{
     }
 
     loadData() {
-        Axios.get('/api/get-categories')
+        Axios.get('/get-categories')
             .then(res => {
                 this.setState({categories: res.data});
                 this.setState({refreshing: false});

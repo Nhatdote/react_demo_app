@@ -20,7 +20,7 @@ export default class Products extends React.Component {
     }
 
     loadData() {
-        Axios.get('/api/product/list/'+this.props.route.params.category.id)
+        Axios.get('/product/list/'+this.props.route.params.category.id)
             .then(res => {
                 this.setState({products: res.data});
                 this.setState({refreshing: false});

@@ -33,4 +33,4 @@ function test() {
     return 124
 }
 
-export default numberFormat;
+export {numberFormat, test};
