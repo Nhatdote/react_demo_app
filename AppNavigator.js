@@ -11,8 +11,9 @@ import Cart from "./screens/Cart"
 import Search from "./screens/Search"
 import Notification from "./screens/Notification"
 import User from "./screens/User"
-import {CartProvider} from "./contexts/Cart"
-import {CartContext} from "./contexts/Cart";
+import {CartProvider} from "./contexts/CartProvider"
+import {CartContext} from "./contexts/CartProvider"
+import {AppProvider} from "./contexts/AppProvider"
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,7 +94,7 @@ function HomeIconWithBadge(props) {
 
 const AppNavigator = () => {
     return (
-        <CartProvider>
+        <AppProvider>
             <Tab.Navigator
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ color, size }) => {
@@ -115,14 +116,13 @@ const AppNavigator = () => {
                                 break;
                             case 'Notification':
                                 iconName = 'bells';
-                                badge = 12;
                                 break;
                         }
                         return (
                             <CartContext.Consumer>
-                                { ({total}) => {
+                                { ({cart}) => {
                                     if (iconName === 'shoppingcart') {
-                                        return <HomeIconWithBadge name={iconName} size={size} color={color} badge={total}/>
+                                        return <HomeIconWithBadge name={iconName} size={size} color={color} badge={cart.length}/>
                                     }else{
                                         return <HomeIconWithBadge name={iconName} size={size} color={color}/>
                                     }
@@ -142,15 +142,12 @@ const AppNavigator = () => {
                 <Tab.Screen name="Notification" component={NotificationStack} options={{title: 'Tìm kiếm'}} />
                 <Tab.Screen name="User" component={UserStack} options={{title: 'Tài khoản'}} />
             </Tab.Navigator>
-        </CartProvider>
+        </AppProvider>
     );
 };
 
 const styles = StyleSheet.create({
-    logoVns: {
-        height: 50,
-        width: 170,
-    }
+
 });
 
 export default AppNavigator;

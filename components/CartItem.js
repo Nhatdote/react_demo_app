@@ -4,7 +4,7 @@ import { FontAwesome5, Feather } from '@expo/vector-icons'
 
 import {numberFormat} from '../js/main'
 import Color from "./Color";
-import {CartContext} from "../contexts/Cart";
+import {CartContext} from "../contexts/CartProvider";
 
 export default function CartItem(props) {
     const { shop } = props;

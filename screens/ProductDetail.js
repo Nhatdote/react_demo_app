@@ -1,10 +1,10 @@
 import React from 'react'
-import {Text, SafeAreaView, StyleSheet, Image, View, Button, Alert} from 'react-native'
-import Axios from "axios";
+import {Text, SafeAreaView, StyleSheet, Image, View, Button, Alert, TouchableOpacity} from 'react-native'
+
 
 import {numberFormat} from "../js/main";
 import Color from "../components/Color"
-import {CartContext} from "../contexts/Cart";
+import {CartContext} from "../contexts/CartProvider";
 
 const addToCart = (productId, qty) => {
     Alert.alert('Added to cart');
@@ -32,7 +32,13 @@ const ProductDetail = (props) => {
                 </View>
                 <View style={styles.actions}>
                     <CartContext.Consumer>
-                        { ({addToCart}) => <Button onPress={() => addToCart(product, 1)} title="Thêm vào giỏ hàng" color="#841584"/>}
+                        { ({addToCart}) => {
+                            return (
+                                <TouchableOpacity activeOpacity={0.6} style={[styles.addToCartBtn]} onPress={() => addToCart(product, 1)}>
+                                    <Text style={{color: 'white'}}>Thêm vào giỏ hàng</Text>
+                                </TouchableOpacity>
+                            );
+                        }}
                     </CartContext.Consumer>
                 </View>
             </View>
@@ -84,6 +90,15 @@ const styles = StyleSheet.create({
     actions: {
         margin: 10
     },
+    addToCartBtn: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+        borderRadius: 3,
+        height: 45,
+        backgroundColor: "#841584",
+    }
 });
 
 export default ProductDetail;

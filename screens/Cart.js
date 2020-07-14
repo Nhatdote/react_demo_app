@@ -3,7 +3,7 @@ import {Text, SafeAreaView, StyleSheet, View, RefreshControl, FlatList, Image} f
 
 import Color from "../components/Color"
 import CartItem from "../components/CartItem"
-import {CartContext} from "../contexts/Cart"
+import {CartContext} from "../contexts/CartProvider"
 import CartEmptyImg from "../images/empty_cart.png"
 
 const showEmptyListView = () => {
@@ -13,11 +13,41 @@ const showEmptyListView = () => {
     </View>
 };
 
+const groupCartByShop = () => {
+    return (
+        <CartContext.Consumer>
+            { ({cart}) => {
+                let shops = {};
+                for (let i = 0; i < cart.length; i++) {
+                    if (typeof shops[cart[i].shop_id] === "undefined") {
+                        shops[cart[i].shop_id] = {
+                            shop_id: cart[i].shop_id,
+                            shop_name: cart[i].shop_name,
+                            products: []
+                        };
+                    }
+                    shops[cart[i].shop_id]['products'].push(cart[i]);
+                }
+                shops = Object.values(shops)
+                return (
+                    <FlatList
+                        data={shops}
+                        renderItem={({ item }) => <CartItem shop={ item }/>}
+                        keyExtractor={(item, index) => `${index}`}
+                        ListEmptyComponent={showEmptyListView()}
+                    />
+                );
+            }}
+        </CartContext.Consumer>
+    );
+};
+
 const Cart = () => {
-    let i = 1;
+    let groupBy = groupCartByShop();
     return (
         <SafeAreaView style={styles.container}>
-            <CartContext.Consumer>
+            {groupBy}
+            {/*<CartContext.Consumer>
                 { ({cart}) => {
                     return (
                         <FlatList
@@ -28,7 +58,7 @@ const Cart = () => {
                         />
                     );
                 }}
-            </CartContext.Consumer>
+            </CartContext.Consumer>*/}
         </SafeAreaView>
     );
 };
