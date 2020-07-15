@@ -26,59 +26,49 @@ export class CartProvider extends React.Component {
     }
 
     componentDidMount() {
-        // this._removeCart();
-        this._getCart();
+        // this._removeData();
+        this._getData();
     }
 
-    _removeCart() {
-        storage.save({
-            key: 'cart',
-            data: null,
-        });
-    }
+    _removeData = async () => {
+        try {
+            await AsyncStorage.removeItem('cart');
+        } catch(e) {
+            // remove error
+        }
+    };
 
-    _setCart() {
-        storage.save({
-            key: 'cart',
-            data: this.state.cart,
-        });
-    }
+    _storeData = async (value) => {
+        try {
+            const jsonValue = JSON.stringify(value);
+            await AsyncStorage.setItem('cart', jsonValue);
+        } catch (e) {
+            // saving error
+        }
+    };
 
-    _getCart() {
-        storage
-            .load({
-                key: 'cart',
-                autoSync: true,
-                syncInBackground: true,
-                syncParams: {
-                    extraFetchOptions: {},
-                    someFlag: true
+    _getData = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('cart');
+            if (jsonValue != null) {
+                let value = JSON.parse(jsonValue);
+                if (!Array.isArray(value)) {
+                    value = [];
                 }
-            })
-            .then(res => {
-                if (res !== null) {
-                    this.setState({cart: res})
-                }
-            })
-            .catch(err => {
-                switch (err.name) {
-                    case 'NotFoundError':
-                        console.error('Your cart not found');
-                        this._removeCart();
-                        break;
-                    case 'ExpiredError':
-                        console.error('Your cart is expired');
-                        this._removeCart();
-                        break;
-                }
-            });
-    }
+                this.setState({cart: value});
+            }else{
+                console.log('Your cart is empty!');
+            }
+        } catch(e) {
+            // error reading value
+        }
+    };
 
     async removeFromCart(product) {
         let cart = this.state.cart;
         cart = cart.filter(item => item.id !== product.id);
         await this.setState({cart: cart});
-        this._setCart();
+        this._storeData(cart);
         Toast.showSuccess('Đã xóa sản phẩm khỏi giỏ hàng', {
             position: 0,
             duration: 500
@@ -99,6 +89,7 @@ export class CartProvider extends React.Component {
             shop_id: product.shop_id,
             shop_name: product.shop_name
         };
+
         if (cart === []) {
             cart.push(cartItem);
         }else{
@@ -118,8 +109,9 @@ export class CartProvider extends React.Component {
                 msg = 'Đã thêm sản phẩm vào giỏ hàng';
             }
         }
+
         await this.setState({cart: cart});
-        this._setCart();
+        this._storeData(cart);
         Toast.showSuccess(msg, {
             position: 0,
             duration: 500

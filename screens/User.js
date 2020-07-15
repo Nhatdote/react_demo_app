@@ -4,128 +4,81 @@ import { AntDesign } from '@expo/vector-icons'
 
 import logo from "../images/logo.jpg"
 import {UserContext} from "../contexts/UserProvider"
+import {SafeAreaView} from "react-navigation";
 
 export default class LoginView extends Component {
-
     constructor(props) {
         super(props);
-        this.state = {
-            username: 'doubletc',
-            password: '123456',
-            user: null
-        }
     }
-
-    loginForm = () => {
-        const {username, password} = this.state;
-        return (
-            <KeyboardAvoidingView
-                behavior={Platform.OS == "ios" ? "padding" : "height"}
-                style={styles.container}
-            >
-                <Image source={logo} style={{height: 80, width: 270, marginBottom: 30}} />
-                <View style={styles.inputContainer}>
-                    <AntDesign style={styles.inputIcon} name="user" />
-                    <TextInput style={styles.inputs}
-                               placeholder="Tài khoản"
-                               underlineColorAndroid='transparent'
-                               onChangeText={(username) => this.setState({username})}/>
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <AntDesign style={styles.inputIcon} name="key" />
-                    <TextInput style={styles.inputs}
-                               placeholder="Mật khẩu"
-                               secureTextEntry={true}
-                               underlineColorAndroid='transparent'
-                               onChangeText={(password) => this.setState({password})}/>
-                </View>
-
-                <UserContext.Consumer>
-                    {({handleLogin}) => {
-                        return (
-                            <TouchableOpacity activeOpacity={0.6} style={[styles.buttonContainer, styles.loginButton]} onPress={() => handleLogin(username, password)}>
-                                <Text style={styles.loginText}>Login</Text>
-                            </TouchableOpacity>
-                        );
-                    }}
-                </UserContext.Consumer>
-
-                <TouchableOpacity activeOpacity={0.6} style={styles.buttonContainer}>
-                    <Text>Forgot your password?</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity activeOpacity={0.6} style={styles.buttonContainer}>
-                    <Text>Register</Text>
-                </TouchableOpacity>
-            </KeyboardAvoidingView>
-        );
-    };
-
-    userProfile = () => {
-        return (
-            <View style={styles.container}>
-                <Text>Xin chào</Text>
-            </View>
-        )
-    };
 
     render() {
         return (
             <UserContext.Consumer>
                 {({user}) => {
-                    if (user === null) {
-                        return this.loginForm();
-                    }else{
-                        return this.userProfile();
-                    }
+                    const {navigation} = this.props;
+                    navigation.setOptions({
+                        title: user.name ? user.name : 'Tài khoản'
+                    });
+                    return (
+                        <SafeAreaView style={styles.container}>
+                            <View style={styles.myShop}>
+                                <Text style={styles.txtMenu}>Cửa hàng của tôi</Text>
+                            </View>
+                            <View style={styles.menuList}>
+                                <Text style={styles.txtMenu}>Thống kê</Text>
+                            </View>
+                            <View style={styles.menuList}>
+                                <Text style={styles.txtMenu}>Hệ thống liên kết</Text>
+                            </View>
+                            <View style={styles.menuList}>
+                                <Text style={styles.txtMenu}>Giao dịch</Text>
+                            </View>
+                            <View style={styles.menuList}>
+                                <Text style={styles.txtMenu}>Lịch sử giao dịch</Text>
+                            </View>
+                            <View style={styles.menuList}>
+                                <Text style={styles.txtMenu}>Thanh toán hóa đơn</Text>
+                            </View>
+                        </SafeAreaView>
+                    );
                 }}
             </UserContext.Consumer>
-        );
+        )
     }
 }
 
 const styles = StyleSheet.create({
     container: {
+        marginVertical: 5,
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
         backgroundColor: 'whitesmoke',
     },
-    inputContainer: {
-        borderBottomColor: '#F5FCFF',
-        backgroundColor: '#FFFFFF',
-        borderRadius:30,
-        borderBottomWidth: 1,
-        width:250,
-        height:45,
-        marginBottom:20,
-        flexDirection: 'row',
-        alignItems:'center'
+    myShop: {
+        paddingVertical: 20,
+        backgroundColor: 'white',
+        marginVertical: 5,
+        marginHorizontal: 10,
+        borderRadius: 3,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        alignItems: 'center'
     },
-    inputs:{
-        height:45,
-        marginLeft:16,
-        borderBottomColor: '#FFFFFF',
-        flex:1,
+    menuList: {
+        paddingVertical: 20,
+        backgroundColor: 'white',
+        marginVertical: 5,
+        marginHorizontal: 10,
+        borderRadius: 3,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        alignItems: 'center'
     },
-    inputIcon:{
-        marginLeft: 20,
-        justifyContent: 'center'
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom:20,
-        width:250,
-        borderRadius:30,
-    },
-    loginButton: {
-        height:45,
-        backgroundColor: "#00b5ec",
-    },
-    loginText: {
-        color: 'white',
+    txtMenu: {
+        fontSize: 14,
+        fontWeight: '700'
     }
 });

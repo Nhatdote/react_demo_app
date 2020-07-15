@@ -11,9 +11,11 @@ import Cart from "./screens/Cart"
 import Search from "./screens/Search"
 import Notification from "./screens/Notification"
 import User from "./screens/User"
+import Login from "./screens/Login";
 import {CartProvider} from "./contexts/CartProvider"
 import {CartContext} from "./contexts/CartProvider"
 import {AppProvider} from "./contexts/AppProvider"
+import {UserContext} from "./contexts/UserProvider";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -22,8 +24,8 @@ const HomeStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Catogories" component={Categories} options={{title: 'Trang chủ'}} />
-            <Stack.Screen name="Products" component={Products} options={{headerBackTitle: ' '}}/>
-            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{headerBackTitle: ' '}} />
+            <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm'}}/>
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết'}} />
         </Stack.Navigator>
     );
 };
@@ -54,11 +56,28 @@ const NotificationStack = () => {
 
 const UserStack = () => {
     return (
-        <Stack.Navigator>
-            <Stack.Screen name="User" component={User} options={{title: 'Tài khoản'}}/>
-        </Stack.Navigator>
+        <UserContext.Consumer>
+            {({user}) => {
+                if (user !== null) {
+                    return (
+                        <Stack.Navigator>
+                            <Stack.Screen name="User" component={User} options={{title: 'Tài khoản'}}/>
+                        </Stack.Navigator>
+                    );
+                }else{
+                    return (
+                        <Stack.Navigator>
+                            <Stack.Screen name="Login" component={Login} options={{title: 'Đăng nhập'}}/>
+                        </Stack.Navigator>
+                    );
+                }
+            }}
+        </UserContext.Consumer>
     );
 };
+
+
+
 
 function IconWithBadge({ name, badge, color, size }) {
     return (
@@ -99,8 +118,6 @@ const AppNavigator = () => {
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ color, size }) => {
                         let iconName;
-                        let badge = 0;
-
                         switch (route.name) {
                             case 'Home':
                                 iconName = 'home';

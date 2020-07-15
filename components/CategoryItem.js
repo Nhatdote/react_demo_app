@@ -27,7 +27,6 @@ const styles  = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         alignItems: 'center'
-
     },
     title: {
         fontSize: 20,

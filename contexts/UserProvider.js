@@ -2,18 +2,7 @@ import React from 'react'
 import {Alert, Keyboard, SafeAreaView} from "react-native"
 import Toast from "react-native-tiny-toast"
 import Axios from "axios"
-import Storage from 'react-native-storage'
 import AsyncStorage from '@react-native-community/async-storage'
-
-const storage = new Storage({
-    size: 1000,
-    storageBackend: AsyncStorage,
-    defaultExpires: 0,
-    enableCache: true,
-    sync: {
-        // we'll talk about the details later.
-    }
-});
 
 export const UserContext = React.createContext();
 
@@ -24,34 +13,56 @@ export class UserProvider extends React.Component {
             user: null,
         };
         this.handleLogin = this.handleLogin.bind(this);
+        this._getData = this._getData.bind(this);
     }
 
     componentDidMount() {
-        this.getToken();
+        //this._removeData();
+        this._getData();
     }
 
-    getToken() {
-        console.log('get token...');
-        storage
-            .load({
-                key: 'userToken',
-                autoSync: true,
-                syncInBackground: true,
-                syncParams: {
-                    extraFetchOptions: {},
-                    someFlag: true
-                }
-            })
-            .then(res => {
-                console.log('storage: ' + res);
-                if (res !== null) {
-                    this.setState({token: res});
-                }
-            })
-            .catch(error => {});
-    }
+    _removeData = async () => {
+        try {
+            await AsyncStorage.removeItem('userToken');
+        } catch(e) {
+            // remove error
+        }
+    };
 
-    handleLogin (username, password) {;
+    _storeData = async (value) => {
+        try {
+            await AsyncStorage.setItem('userToken', value);
+        } catch (e) {
+            // error storing value
+        }
+    };
+
+    _getData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('userToken');
+            if(value !== null) {
+                Axios.get('/check-token?token='+value)
+                    .then(res => {
+                        if (res.data.status === 1) {
+                            this.setState({user: res.data.data});
+                            Toast.show(res.data.msg);
+                        }else{
+                            Toast.show(res.data.msg, {position: 25, duration: 3000});
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        Toast.show('Phiên đăng nhập hết hạn');
+                    })
+            }else{
+                Toast.show('Bạn chưa đăng nhập');
+            }
+        } catch(e) {
+            // error reading value
+        }
+    };
+
+    handleLogin (username, password) {
         if (!username) {
             Toast.show('Bạn chưa nhập tài khoản',{
                 position: 25,
@@ -71,10 +82,7 @@ export class UserProvider extends React.Component {
                 .then(res => {
                     if (res.data.status === 1) {
                         this.setState({user: res.data.data});
-                        storage.save({
-                            key: 'userToken',
-                            data: res.data.data.token,
-                        });
+                        this._storeData(res.data.data.token);
                         Toast.showSuccess(res.data.msg, {
                             position: 0,
                             duration: 1000
