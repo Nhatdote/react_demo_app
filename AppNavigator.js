@@ -156,7 +156,7 @@ const AppNavigator = () => {
                 <Tab.Screen name="Home" component={HomeStack} options={{title: 'Trang chủ'}} />
                 <Tab.Screen name="Cart" component={CartStack} options={{title: 'Giỏ hàng'}} />
                 <Tab.Screen name="Search" component={SearchStack} options={{title: 'Tìm kiếm'}} />
-                <Tab.Screen name="Notification" component={NotificationStack} options={{title: 'Tìm kiếm'}} />
+                <Tab.Screen name="Notification" component={NotificationStack} options={{title: 'Thông báo'}} />
                 <Tab.Screen name="User" component={UserStack} options={{title: 'Tài khoản'}} />
             </Tab.Navigator>
         </AppProvider>

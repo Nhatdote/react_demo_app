@@ -15,6 +15,7 @@ export default class Categories extends React.Component{
     }
 
     componentDidMount() {
+
         this.loadData();
     }
 

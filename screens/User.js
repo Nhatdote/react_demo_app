@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Keyboard} from 'react-native'
+import {StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Keyboard, TouchableHighlight} from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 
 import logo from "../images/logo.jpg"
@@ -14,10 +14,10 @@ export default class LoginView extends Component {
     render() {
         return (
             <UserContext.Consumer>
-                {({user}) => {
+                {({user, handleLogout}) => {
                     const {navigation} = this.props;
                     navigation.setOptions({
-                        title: user.name ? user.name : 'Tài khoản'
+                        title: user !== null ? user.name : 'Tài khoản'
                     });
                     return (
                         <SafeAreaView style={styles.container}>
@@ -39,6 +39,9 @@ export default class LoginView extends Component {
                             <View style={styles.menuList}>
                                 <Text style={styles.txtMenu}>Thanh toán hóa đơn</Text>
                             </View>
+                            <TouchableOpacity style={styles.menuList} onPress={() => handleLogout()}>
+                                <Text style={styles.txtMenu}>Đăng xuất</Text>
+                            </TouchableOpacity>
                         </SafeAreaView>
                     );
                 }}

@@ -10,16 +10,37 @@ export class UserProvider extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            user: null,
+            token: null,
+            user: null
         };
         this.handleLogin = this.handleLogin.bind(this);
         this._getData = this._getData.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         //this._removeData();
-        this._getData();
+        const token = await this._getData();
+        if (token) {
+            this.loginToken(token);
+            this.setState({token: token})
+        }
     }
+
+    loginToken = (token) => {
+        Axios.get('/check-token?token='+token)
+            .then(res => {
+                if (res.data.status === 1) {
+                    this.setState({user: res.data.data});
+                    Toast.show(res.data.msg);
+                }else{
+                    Toast.show(res.data.msg);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                Toast.show('Phiên đăng nhập hết hạn');
+            });
+    };
 
     _removeData = async () => {
         try {
@@ -41,22 +62,11 @@ export class UserProvider extends React.Component {
         try {
             const value = await AsyncStorage.getItem('userToken');
             if(value !== null) {
-                Axios.get('/check-token?token='+value)
-                    .then(res => {
-                        if (res.data.status === 1) {
-                            this.setState({user: res.data.data});
-                            Toast.show(res.data.msg);
-                        }else{
-                            Toast.show(res.data.msg, {position: 25, duration: 3000});
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        Toast.show('Phiên đăng nhập hết hạn');
-                    })
+                return value;
             }else{
                 Toast.show('Bạn chưa đăng nhập');
             }
+
         } catch(e) {
             // error reading value
         }
@@ -98,10 +108,21 @@ export class UserProvider extends React.Component {
         }
     }
 
+    handleLogout = async () => {
+        await this._removeData();
+        this.setState({
+            token: null,
+            user: null
+        });
+        Toast.showSuccess('Đăng xuất thành công');
+    };
+
     render() {
         return (
             <UserContext.Provider value={{
                 handleLogin: this.handleLogin,
+                handleLogout: this.handleLogout,
+                token: this.state.token,
                 user: this.state.user
             }}>
                 {this.props.children}
