@@ -3,13 +3,12 @@ import {RefreshControl, StyleSheet, SafeAreaView, Text, View, Alert, FlatList} f
 import CategoryItem from '../components/CategoryItem'
 import Axios from 'axios'
 
-
 export default class Categories extends React.Component{
     constructor (props) {
         super(props);
         this.state = {
             categories: [],
-            refreshing: true
+            refreshing: false
         };
         this.onRefresh = this.onRefresh.bind(this);
     }
@@ -22,8 +21,10 @@ export default class Categories extends React.Component{
     loadData() {
         Axios.get('/get-categories')
             .then(res => {
-                this.setState({categories: res.data});
-                this.setState({refreshing: false});
+                this.setState({
+                    categories: res.data,
+                    refreshing: false
+                });
             })
     }
 

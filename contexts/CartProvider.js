@@ -98,6 +98,7 @@ export class CartProvider extends React.Component {
                 if (item.id === cartItem.id) {
                     updateCart = true;
                     item.quantity += qty;
+                    item.total += item.sale_price * qty;
                     if (item.quantity <= 0) {
                         cart.splice(index, 1);
                     }

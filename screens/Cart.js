@@ -28,11 +28,11 @@ const groupCartByShop = () => {
                     }
                     shops[cart[i].shop_id]['products'].push(cart[i]);
                 }
-                shops = Object.values(shops)
+                shops = Object.values(shops);
                 return (
                     <FlatList
                         data={shops}
-                        renderItem={({ item }) => <CartItem shop={ item }/>}
+                        renderItem={({ item }) => <CartItem shop={ item } />}
                         keyExtractor={(item, index) => `${index}`}
                         ListEmptyComponent={showEmptyListView()}
                     />

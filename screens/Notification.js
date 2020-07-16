@@ -1,6 +1,6 @@
 import React from 'react'
 import {Text, View, SafeAreaView, StyleSheet, FlatList, RefreshControl, Alert} from 'react-native'
-import Html from 'react-native-htmlview'
+import Toast from "react-native-tiny-toast";
 
 import Color from "../components/Color"
 import {UserContext} from "../contexts/UserProvider";
@@ -13,27 +13,37 @@ export default class Notification extends React.Component {
             currentPage: 1,
             totalPage: null,
             notifications: [],
+            refreshing: false
         };
         //this.getNotification = this.getNotification.bind(this);
     }
 
     static contextType = UserContext;
 
-    componentDidMount() {
+    loadData() {
         const { token } = this.context;
-        Axios.get('/get-notifications', {
-            headers: {
-                Authorization: 'Bearer' + token
-            }
-        })
-            .then(res => {
-                if (res.data.status === 1) {
-                    this.setState({notifications: res.data.data.data});
-                }else{
-                    Alert.alert(res.data.msg);
+        if (token) {
+            Axios.get('/get-notifications', {
+                headers: {
+                    Authorization: 'Bearer' + token
                 }
             })
-            .catch(error => console.warn(error));
+                .then(res => {
+                    if (res.data.status === 1) {
+                        this.setState({
+                            notifications: res.data.data.data,
+                            refreshing: false
+                        });
+                    }else{
+                        Alert.alert(res.data.msg);
+                    }
+                })
+                .catch(error => console.warn(error));
+        }
+    }
+
+    componentDidMount() {
+        this.loadData();
     }
 
     renderItem = (item) => {
@@ -44,6 +54,18 @@ export default class Notification extends React.Component {
         );
     };
 
+    showEmptyListView = () => {
+        return(
+            <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Không có thông báo</Text>
+        );
+    };
+
+    async onRefresh() {
+        this.setState({refreshing: true});
+        await this.loadData();
+        Toast.show('Đã làm mới thông báo', {duration: 1000})
+    }
+
     render() {
         return (
             <UserContext.Consumer>
@@ -51,25 +73,18 @@ export default class Notification extends React.Component {
                     if (user === null) {
                         return <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Bạn chưa đăng nhập</Text>
                     }else{
-                        const {notifications} = this.state;
+                        const {notifications, refreshing} = this.state;
                         return (
                             <SafeAreaView style={styles.container}>
                                 <FlatList
+                                    refreshControl={
+                                        <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
+                                    }
                                     data={notifications}
                                     renderItem={({item}) => this.renderItem(item)}
                                     keyExtractor={item => `${item.id}`}
+                                    ListEmptyComponent={this.showEmptyListView()}
                                 />
-                                <View style={styles.pagination}>
-                                    <View style={styles.page}>
-                                        <Text>1</Text>
-                                    </View>
-                                    <View style={styles.page}>
-                                        <Text>2</Text>
-                                    </View>
-                                    <View style={styles.page}>
-                                        <Text>3</Text>
-                                    </View>
-                                </View>
                             </SafeAreaView>
                         );
                     }
@@ -92,9 +107,9 @@ const styles = StyleSheet.create({
         padding: 20,
         marginVertical: 5,
         marginHorizontal: 10,
-        borderRadius: 3,
+        borderRadius: 5,
         shadowColor: '#000',
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.2,
         shadowRadius: 5,
     },
     pagination: {

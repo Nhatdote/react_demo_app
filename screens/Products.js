@@ -10,9 +10,8 @@ export default class Products extends React.Component {
         super(props);
         this.state = {
             products: [],
-            refreshing: true
+            refreshing: false
         };
-        this.loadData = this.loadData.bind(this);
     }
 
     componentDidMount() {
@@ -22,8 +21,10 @@ export default class Products extends React.Component {
     loadData() {
         Axios.get('/product/list/'+this.props.route.params.category.id)
             .then(res => {
-                this.setState({products: res.data});
-                this.setState({refreshing: false});
+                this.setState({
+                    products: res.data,
+                    refreshing: false
+                });
             })
             .catch(error => console.log(error));
     }
@@ -54,7 +55,7 @@ export default class Products extends React.Component {
                     columnWrapperStyle={styles.flatWrapper}
                     data={products}
                     renderItem={({ item }) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
-                        product: item
+                        productId: item.id
                     })} /></View>}
                     keyExtractor={(item) => `${item.id}`}
                     ListEmptyComponent={this.showEmptyListView()}

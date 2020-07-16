@@ -7,7 +7,7 @@ import Color from "./Color";
 import {CartContext} from "../contexts/CartProvider";
 
 export default function CartItem(props) {
-    const { shop } = props;
+    const { shop, addToCart } = props;
     return (
         <SafeAreaView style={ styles.container }>
             <View style={{paddingBottom: 5, backgroundColor: Color.secondary, width: '100%'}}>

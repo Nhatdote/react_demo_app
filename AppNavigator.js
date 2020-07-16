@@ -42,6 +42,7 @@ const SearchStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Search" component={Search} options={{title: 'Tìm kiếm'}}/>
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết'}} />
         </Stack.Navigator>
     );
 };
@@ -68,6 +69,7 @@ const UserStack = () => {
                     return (
                         <Stack.Navigator>
                             <Stack.Screen name="Login" component={Login} options={{title: 'Đăng nhập'}}/>
+                            <Stack.Screen name="Register" component={Login} options={{title: 'Đăng ký'}}/>
                         </Stack.Navigator>
                     );
                 }

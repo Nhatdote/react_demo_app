@@ -5,49 +5,74 @@ import {Text, SafeAreaView, StyleSheet, Image, View, Button, Alert, TouchableOpa
 import {numberFormat} from "../js/main";
 import Color from "../components/Color"
 import {CartContext} from "../contexts/CartProvider";
+import Axios from "axios";
 
-const addToCart = (productId, qty) => {
-    Alert.alert('Added to cart');
-};
+export default class ProductDetail extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            product: null
+        }
+    }
 
+    componentDidMount() {
+        const {route} = this.props;
+        const {productId} = route.params;
+        Axios.get('/product/'+productId)
+            .then(res => {
+                this.setState({product: res.data})
+            })
+            .catch(error => console.warn(error));
+    }
 
-const ProductDetail = (props) => {
-    const {route, navigation} = props;
-    const {product} = route.params;
-    navigation.setOptions({
-        title: product.name ? product.name : 'Chi tiết sản phẩm'
-    });
-    return (
-        <SafeAreaView>
-            <View style={styles.container}>
-                <Text style={styles.title}>{product.name}</Text>
-                <View style={styles.detail}>
-                    <Image style={styles.avatar} source={{uri: product.image}} />
-                    <View style={styles.info}>
-                        <Text>Thương hiệu: <Text style={styles.textSecondary}>{product.brand}</Text></Text>
-                        <Text>Nhà cung cấp: <Text style={styles.textSecondary}>{product.vendor}</Text></Text>
-                        <Text>Danh mục: <Text style={styles.textSecondary}>{product.child_category.name ? product.child_category.name : 'Chưa phân loại'}</Text></Text>
-                        <Text style={styles.price}>{numberFormat(product.sale_price * product.rate) + ' đ'}</Text>
+    render() {
+        const {product} = this.state;
+        const {navigation} = this.props;
+
+        if (product === null) {
+            return (
+                <SafeAreaView>
+                    <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Sản phẩm đã bị ẩn hoặc xóa</Text>
+                </SafeAreaView>
+            );
+        }else{
+            navigation.setOptions({
+                title: product.name
+            });
+            return (
+                <SafeAreaView>
+                    <View style={styles.container}>
+                        <Text style={styles.title}>{product.name}</Text>
+                        <View style={styles.detail}>
+                            <Image style={styles.avatar} source={{uri: product.image}} />
+                            <View style={styles.info}>
+                                <Text>Thương hiệu: <Text style={styles.textSecondary}>{product.brand}</Text></Text>
+                                <Text>Nhà cung cấp: <Text style={styles.textSecondary}>{product.vendor}</Text></Text>
+                                <Text>Danh mục: <Text style={styles.textSecondary}>{product.child_category.name ? product.child_category.name : 'Chưa phân loại'}</Text></Text>
+                                <Text style={styles.price}>{numberFormat(product.sale_price * product.rate) + ' đ'}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.actions}>
+                            <CartContext.Consumer>
+                                { ({addToCart}) => {
+                                    return (
+                                        <TouchableOpacity activeOpacity={0.6} style={[styles.addToCartBtn]} onPress={() => addToCart(product, 1)}>
+                                            <Text style={{color: 'white'}}>Thêm vào giỏ hàng</Text>
+                                        </TouchableOpacity>
+                                    );
+                                }}
+                            </CartContext.Consumer>
+                        </View>
                     </View>
-                </View>
-                <View style={styles.actions}>
-                    <CartContext.Consumer>
-                        { ({addToCart}) => {
-                            return (
-                                <TouchableOpacity activeOpacity={0.6} style={[styles.addToCartBtn]} onPress={() => addToCart(product, 1)}>
-                                    <Text style={{color: 'white'}}>Thêm vào giỏ hàng</Text>
-                                </TouchableOpacity>
-                            );
-                        }}
-                    </CartContext.Consumer>
-                </View>
-            </View>
-            <View style={styles.container}>
-                <Text>{product.shop.name}</Text>
-            </View>
-        </SafeAreaView>
-    );
-};
+                    <View style={styles.container}>
+                        <Text>{product.shop.name}</Text>
+                    </View>
+                </SafeAreaView>
+            );
+        }
+    }
+}
+
 
 const styles = StyleSheet.create({
     container: {
@@ -100,5 +125,3 @@ const styles = StyleSheet.create({
         backgroundColor: "#841584",
     }
 });
-
-export default ProductDetail;
