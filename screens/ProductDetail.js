@@ -104,7 +104,7 @@ export default class ProductDetail extends React.Component{
                                     <Text numberOfLines={1} style={{fontSize: 20, color: Color.primary, width: Dimensions.get('window').width - 120}}>{product.shop.name}</Text>
                                     <Text style={{color: Color.muted}}><SimpleLineIcons name="screen-smartphone"/> {product.shop.phone_st}</Text>
                                     {/*<Button title="Xem Shop" color={Color.secondary} onPress={() => Alert.alert('123')} />*/}
-                                    <Button icon="chevron-double-right" mode="contained" onPress={() => {}}>
+                                    <Button icon="chevron-double-right" mode="contained" onPress={() => navigation.navigate('ShopView')}>
                                         Xem Shop
                                     </Button>
                                 </View>

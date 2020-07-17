@@ -12,6 +12,8 @@ import Search from "./screens/Search"
 import Notification from "./screens/Notification"
 import User from "./screens/User"
 import Login from "./screens/Login";
+import ShopView from "./screens/Shop/Customer/Dashboard";
+
 import {CartProvider} from "./contexts/CartProvider"
 import {CartContext} from "./contexts/CartProvider"
 import {AppProvider} from "./contexts/AppProvider"
@@ -26,6 +28,7 @@ const HomeStack = () => {
             <Stack.Screen name="Catogories" component={Categories} options={{title: 'Trang chủ'}} />
             <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm', headerBackTitle: ' '}}/>
             <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
+            <Stack.Screen name="ShopView" component={ShopView} options={{title: 'Cửa hàng'}} />
         </Stack.Navigator>
     );
 };
@@ -42,7 +45,6 @@ const SearchStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Search" component={Search} options={{title: 'Tìm kiếm'}}/>
-            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
     );
 };

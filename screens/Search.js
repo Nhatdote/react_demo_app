@@ -1,17 +1,5 @@
 import React from 'react'
-import {
-    StyleSheet,
-    SafeAreaView,
-    View,
-    Text,
-    Button,
-    Dimensions,
-    TextInput,
-    Keyboard,
-    TouchableWithoutFeedback, TouchableOpacity,
-    Alert,
-    RefreshControl, FlatList, Image, ScrollView
-} from "react-native"
+import {StyleSheet, SafeAreaView, View, Text, Button, Dimensions, TextInput, Keyboard, TouchableWithoutFeedback, TouchableOpacity, Alert, RefreshControl, FlatList, Image, ScrollView, ActivityIndicator} from "react-native"
 import { AntDesign } from '@expo/vector-icons'
 import Axios from "axios";
 
@@ -25,7 +13,8 @@ const initState = {
     results: [],
     resultTotal: 0,
     currentPage: 0,
-    lastPage: 0
+    lastPage: 0,
+    readyData: true
 };
 
 export default class Search extends React.Component{
@@ -33,19 +22,9 @@ export default class Search extends React.Component{
         super(props);
         this.state = initState;
         this.timeout = 0;
+        this.searching = false;
     }
 
-    emptyResults = () => {
-        return(
-            <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Không tìm thấy dữ liệu</Text>
-        );
-    };
-
-    notSearched = () => {
-        return(
-            <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Nhập từ khóa tìm kiếm</Text>
-        );
-    };
 
     handleSearch = async (search) => {
         this.setState({search: search});
@@ -58,7 +37,7 @@ export default class Search extends React.Component{
         if(this.timeout){
             clearTimeout(this.timeout)
         }
-
+        this.setState({readyData: false});
         this.timeout = setTimeout(() => {
             Axios.get('/search?s='+search)
                 .then(res => {
@@ -66,16 +45,17 @@ export default class Search extends React.Component{
                         results: res.data.data,
                         resultTotal: res.data.total,
                         currentPage: res.data.current_page,
-                        lastPage: res.data.last_page
-                    })
+                        lastPage: res.data.last_page,
+                        readyData: true,
+                    });
                 })
-                .catch(error => console.warn(error));
+                .catch(error => console.warn(error))
         }, 300);
     };
 
     render() {
         const {navigation} = this.props;
-        const {search, results} = this.state;
+        const {search, results, readyData} = this.state;
         return (
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
                 <SafeAreaView style={styles.container}>
@@ -87,16 +67,24 @@ export default class Search extends React.Component{
                             placeholder={'Tìm kiếm sản phẩm'}
                         />
                     </View>
-                    <FlatList
-                        columnWrapperStyle={styles.flatWrapper}
-                        data={results}
-                        renderItem={({item}) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
-                            productId: item.id
-                        })} /></View>}
-                        keyExtractor={item => `${item.id}`}
-                        ListEmptyComponent={search === '' ? this.notSearched() : this.emptyResults()}
-                        numColumns={2}
-                    />
+                    {!readyData
+                        ? <View style={{flex: 1, justifyContent: 'center'}}>
+                            <ActivityIndicator size="large" />
+                        </View>
+                        : <FlatList
+                            columnWrapperStyle={styles.flatWrapper}
+                            data={results}
+                            renderItem={({item}) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
+                                productId: item.id
+                            })} /></View>}
+                            keyExtractor={item => `${item.id}`}
+                            ListEmptyComponent={search === ''
+                                ? () => <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Nhập từ khóa tìm kiếm</Text>
+                                : () => <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Không tìm thấy dữ liệu</Text>
+                            }
+                            numColumns={2}
+                        />
+                    }
                 </SafeAreaView>
             </TouchableWithoutFeedback>
         );
