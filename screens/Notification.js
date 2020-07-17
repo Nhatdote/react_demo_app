@@ -1,10 +1,12 @@
 import React from 'react'
 import {Text, View, SafeAreaView, StyleSheet, FlatList, RefreshControl, Alert} from 'react-native'
+import Axios from "axios";
 import Toast from "react-native-tiny-toast";
+import AsyncStorage from '@react-native-community/async-storage'
+
 
 import Color from "../components/Color"
 import {UserContext} from "../contexts/UserProvider";
-import Axios from "axios";
 
 export default class Notification extends React.Component {
     constructor(props) {
@@ -13,32 +15,37 @@ export default class Notification extends React.Component {
             currentPage: 1,
             totalPage: null,
             notifications: [],
-            refreshing: false
+            refreshing: false,
         };
         //this.getNotification = this.getNotification.bind(this);
     }
 
-    static contextType = UserContext;
-
-    loadData() {
-        const { token } = this.context;
-        if (token) {
-            Axios.get('/get-notifications', {
-                headers: {
-                    Authorization: 'Bearer' + token
-                }
-            })
-                .then(res => {
-                    if (res.data.status === 1) {
-                        this.setState({
-                            notifications: res.data.data.data,
-                            refreshing: false
-                        });
-                    }else{
-                        Alert.alert(res.data.msg);
+    async loadData() {
+        try {
+            const value = await AsyncStorage.getItem('userToken');
+            if (value !== null) {
+                Axios.get('/get-notifications', {
+                    headers: {
+                        Authorization: 'Bearer' + value
                     }
                 })
-                .catch(error => console.warn(error));
+                    .then(res => {
+                        if (res.data.status === 1) {
+                            this.setState({
+                                notifications: res.data.data.data,
+                            });
+                        }else{
+                            Toast.show(res.data.msg, {duration: 1000});
+                        }
+                    })
+                    .catch(error => console.warn(error))
+                    .then(() => {
+                        this.setState({refreshing: false});
+                    });
+            }
+        } catch(e) {
+            // error reading value
+            this.setState({refreshing: false});
         }
     }
 
@@ -54,12 +61,6 @@ export default class Notification extends React.Component {
         );
     };
 
-    showEmptyListView = () => {
-        return(
-            <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Không có thông báo</Text>
-        );
-    };
-
     async onRefresh() {
         this.setState({refreshing: true});
         await this.loadData();
@@ -70,12 +71,13 @@ export default class Notification extends React.Component {
         return (
             <UserContext.Consumer>
                 {({user}) => {
-                    if (user === null) {
-                        return <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Bạn chưa đăng nhập</Text>
-                    }else{
-                        const {notifications, refreshing} = this.state;
-                        return (
-                            <SafeAreaView style={styles.container}>
+                    const {notifications, refreshing} = this.state;
+                    return (
+                        <SafeAreaView style={styles.container}>
+                            {user === null
+                                ?
+                                <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Bạn chưa đăng nhập</Text>
+                                :
                                 <FlatList
                                     refreshControl={
                                         <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
@@ -83,11 +85,12 @@ export default class Notification extends React.Component {
                                     data={notifications}
                                     renderItem={({item}) => this.renderItem(item)}
                                     keyExtractor={item => `${item.id}`}
-                                    ListEmptyComponent={this.showEmptyListView()}
+                                    ListEmptyComponent={() => <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Không có thông báo</Text>}
                                 />
-                            </SafeAreaView>
-                        );
-                    }
+                            }
+                        </SafeAreaView>
+
+                    );
                 }}
             </UserContext.Consumer>
         );
@@ -97,7 +100,7 @@ export default class Notification extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'stretch',
         backgroundColor: 'whitesmoke',
         paddingVertical: 5

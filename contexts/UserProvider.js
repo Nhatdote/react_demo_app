@@ -11,7 +11,8 @@ export class UserProvider extends React.Component {
         super(props);
         this.state = {
             token: null,
-            user: null
+            user: null,
+            logging: false
         };
         this.handleLogin = this.handleLogin.bind(this);
         this._getData = this._getData.bind(this);
@@ -63,10 +64,7 @@ export class UserProvider extends React.Component {
             const value = await AsyncStorage.getItem('userToken');
             if(value !== null) {
                 return value;
-            }else{
-                Toast.show('Bạn chưa đăng nhập');
             }
-
         } catch(e) {
             // error reading value
         }
@@ -85,14 +83,19 @@ export class UserProvider extends React.Component {
             });
         }else {
             Keyboard.dismiss();
+            this.setState({
+                logging: true
+            });
             Axios.post('/login', {
                 username: username,
                 password: password
             })
-                .then(res => {
+                .then(async res => {
                     if (res.data.status === 1) {
-                        this.setState({user: res.data.data});
-                        this._storeData(res.data.data.token);
+                        await this._storeData(res.data.data.token);
+                        this.setState({
+                            user: res.data.data,
+                        });
                         Toast.showSuccess(res.data.msg, {
                             position: 0,
                             duration: 1000
@@ -105,6 +108,7 @@ export class UserProvider extends React.Component {
                     }
                 })
                 .catch(error => console.log(error))
+                .then(() => this.setState({ logging: false}))
         }
     }
 
@@ -114,7 +118,7 @@ export class UserProvider extends React.Component {
             token: null,
             user: null
         });
-        Toast.showSuccess('Đăng xuất thành công');
+        Toast.showSuccess('Đăng xuất thành công', {duration: 1000});
     };
 
     render() {
@@ -123,7 +127,8 @@ export class UserProvider extends React.Component {
                 handleLogin: this.handleLogin,
                 handleLogout: this.handleLogout,
                 token: this.state.token,
-                user: this.state.user
+                user: this.state.user,
+                logging: this.state.logging
             }}>
                 {this.props.children}
             </UserContext.Provider>

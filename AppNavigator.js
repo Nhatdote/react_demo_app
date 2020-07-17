@@ -24,8 +24,8 @@ const HomeStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Catogories" component={Categories} options={{title: 'Trang chủ'}} />
-            <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm'}}/>
-            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết'}} />
+            <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm', headerBackTitle: ' '}}/>
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
     );
 };
@@ -42,7 +42,7 @@ const SearchStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Search" component={Search} options={{title: 'Tìm kiếm'}}/>
-            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết'}} />
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
     );
 };

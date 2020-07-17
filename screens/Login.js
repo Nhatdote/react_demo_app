@@ -1,6 +1,7 @@
 import React from 'react'
 import {StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Keyboard} from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
+import {Button} from 'react-native-paper'
 
 import logo from "../images/logo.jpg"
 import {UserContext} from "../contexts/UserProvider";
@@ -40,14 +41,15 @@ export default class Login extends React.Component {
                 </View>
 
                 <UserContext.Consumer>
-                    {({handleLogin}) => {
+                    {({handleLogin, logging}) => {
                         return (
-                            <TouchableOpacity activeOpacity={0.6} style={[styles.buttonContainer, styles.loginButton]} onPress={() => handleLogin(username, password)}>
-                                <Text style={styles.loginText}>Login</Text>
-                            </TouchableOpacity>
+                            <Button mode="contained" icon="chevron-double-right" loading={logging} style={styles.loginButton} onPress={() => handleLogin(username, password)}>
+                                Login
+                            </Button>
                         );
                     }}
                 </UserContext.Consumer>
+
 
                 <TouchableOpacity activeOpacity={0.6} style={styles.buttonContainer}>
                     <Text>Forgot your password?</Text>
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
         borderRadius:30,
         borderBottomWidth: 1,
         width:250,
-        height:45,
+        height: 40,
         marginBottom:20,
         flexDirection: 'row',
         alignItems:'center'
@@ -98,8 +100,9 @@ const styles = StyleSheet.create({
         borderRadius:30,
     },
     loginButton: {
-        height:45,
-        backgroundColor: "#00b5ec",
+        width:250,
+        borderRadius:30,
+        marginBottom:20,
     },
     loginText: {
         color: 'white',

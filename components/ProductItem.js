@@ -28,7 +28,7 @@ const styles  = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         alignItems: 'center',
-        marginHorizontal: 4,
+        marginHorizontal: 3,
     },
     title: {
         textAlign: 'center',

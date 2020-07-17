@@ -18,41 +18,40 @@ import Axios from "axios";
 
 import Color from "../components/Color";
 import {numberFormat} from "../js/main";
+import ProductItem from "../components/ProductItem";
+
+const initState = {
+    search: '',
+    results: [],
+    resultTotal: 0,
+    currentPage: 0,
+    lastPage: 0
+};
 
 export default class Search extends React.Component{
     constructor(props) {
         super(props);
-        this.state = {
-            search: '',
-            results: [],
-            resultTotal: 0,
-            currentPage: 0,
-            lastPage: 0
-        };
+        this.state = initState;
         this.timeout = 0;
     }
 
-    showEmptyListView = () => {
+    emptyResults = () => {
         return(
             <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Không tìm thấy dữ liệu</Text>
         );
     };
 
-    renderItem = (item) => {
-        const {navigation} = this.props;
-        return (
-            <TouchableOpacity style={styles.resultItem} onPress={() => navigation.navigate('ProductDetail', {productId: item.id})}>
-                <Image source={{uri: item.image}} style={{height: 40, width: 40, borderRadius: 50, marginRight: 5}} />
-                <View style={{width: Dimensions.get('window').width - 130}}>
-                    <Text numberOfLines={1}>{item.name}</Text>
-                    <Text style={{color: 'tomato'}}>{numberFormat(item.sale_price * item.rate)} đ</Text>
-                </View>
-            </TouchableOpacity>
+    notSearched = () => {
+        return(
+            <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Nhập từ khóa tìm kiếm</Text>
         );
     };
 
     handleSearch = async (search) => {
+        this.setState({search: search});
         if (search === '') {
+            clearTimeout(this.timeout)
+            this.setState(initState);
             return;
         }
 
@@ -75,6 +74,7 @@ export default class Search extends React.Component{
     };
 
     render() {
+        const {navigation} = this.props;
         const {search, results} = this.state;
         return (
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
@@ -85,16 +85,17 @@ export default class Search extends React.Component{
                             style={styles.searchBox}
                             onChangeText={search => this.handleSearch(search)}
                             placeholder={'Tìm kiếm sản phẩm'}
-                            onFocus={isFocus => this.setState({isFocus})}
                         />
                     </View>
-
                     <FlatList
-                        style={styles.resultWrap}
+                        columnWrapperStyle={styles.flatWrapper}
                         data={results}
-                        renderItem={({item}) => this.renderItem(item)}
+                        renderItem={({item}) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
+                            productId: item.id
+                        })} /></View>}
                         keyExtractor={item => `${item.id}`}
-                        ListEmptyComponent={this.showEmptyListView()}
+                        ListEmptyComponent={search === '' ? this.notSearched() : this.emptyResults()}
+                        numColumns={2}
                     />
                 </SafeAreaView>
             </TouchableWithoutFeedback>
@@ -107,33 +108,27 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'flex-start',
-        alignItems: 'center',
+        alignItems: 'stretch',
         backgroundColor: 'whitesmoke',
         paddingVertical: 10
     },
     searchWrap: {
-        marginHorizontal: 15,
+        marginHorizontal: 6,
         backgroundColor: '#fff',
         flexDirection: 'row',
-        borderRadius: 10
+        borderRadius: 10,
+        marginBottom: 10
     },
     searchBox: {
         height: 40,
         paddingHorizontal: 14,
         flexGrow: 1
     },
-    resultWrap: {
-        margin: 15,
+    flatProduct: {
+        flex: 1
     },
-    resultItem: {
-        backgroundColor: 'white',
-        padding: 10,
-        marginVertical: 5,
-        marginHorizontal: 10,
-        borderRadius: 5,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        flexDirection: 'row'
-    },
+    flatWrapper: {
+        paddingHorizontal: 3,
+        paddingVertical: 3
+    }
 });

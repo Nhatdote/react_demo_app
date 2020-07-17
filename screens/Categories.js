@@ -1,53 +1,64 @@
 import React from 'react'
-import {RefreshControl, StyleSheet, SafeAreaView, Text, View, Alert, FlatList} from 'react-native'
-import CategoryItem from '../components/CategoryItem'
+import {RefreshControl, StyleSheet, SafeAreaView, Text, View, Alert, FlatList, ActivityIndicator, Image} from 'react-native'
 import Axios from 'axios'
+import Toast from "react-native-tiny-toast";
+
+import CategoryItem from '../components/CategoryItem'
 
 export default class Categories extends React.Component{
     constructor (props) {
         super(props);
         this.state = {
             categories: [],
-            refreshing: false
+            refreshing: false,
+            readyData: false
         };
         this.onRefresh = this.onRefresh.bind(this);
     }
 
     componentDidMount() {
-
         this.loadData();
     }
 
-    loadData() {
+    loadData(refresh = false) {
         Axios.get('/get-categories')
-            .then(res => {
-                this.setState({
+            .then(async res => {
+                await this.setState({
                     categories: res.data,
-                    refreshing: false
+                    refreshing: false,
+                    readyData: true
                 });
+                if (refresh) {
+                    Toast.show('Đã làm mới danh mục ',  {duration: 500})
+                }
             })
     }
 
     onRefresh() {
         this.setState({refreshing: true});
-        this.loadData();
+        this.loadData(true);
     }
 
     render() {
         const {navigation} = this.props;
-        const {categories, refreshing} = this.state;
+        const {categories, refreshing, readyData} = this.state;
         return (
             <SafeAreaView style={ styles.container }>
-                <FlatList
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={this.onRefresh} />
-                    }
-                    data={ categories }
-                    renderItem={({ item }) => <CategoryItem category={ item } onPress={() => navigation.navigate('Products', {
-                        category: item
-                    })} />}
-                    keyExtractor={(item) => `${item.id}`}
-                />
+                {!readyData
+                    ?
+                    <ActivityIndicator size="large" />
+                    :
+                    <FlatList
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={this.onRefresh} />
+                        }
+                        data={ categories }
+                        renderItem={({ item }) => <CategoryItem category={ item } onPress={() => navigation.navigate('Products', {
+                            category: item
+                        })} />}
+                        keyExtractor={(item) => `${item.id}`}
+                    />
+                }
             </SafeAreaView>
         );
     }
