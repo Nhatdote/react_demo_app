@@ -5,6 +5,7 @@ import Toast from "react-native-tiny-toast";
 
 import ProductItem from "../components/ProductItem";
 import Color from "../components/Color";
+import css from "../js/style";
 
 export default class Products extends React.Component {
     constructor(props) {
@@ -33,10 +34,6 @@ export default class Products extends React.Component {
                 }
             })
             .catch(error => console.log(error));
-    }
-
-    showEmptyListView() {
-        return <Text style={styles.noProduct}>Không có dữ liệu</Text>
     }
 
     onRefresh() {
@@ -68,7 +65,7 @@ export default class Products extends React.Component {
                             productId: item.id
                         })} /></View>}
                         keyExtractor={(item) => `${item.id}`}
-                        ListEmptyComponent={this.showEmptyListView()}
+                        ListEmptyComponent={() => <Text style={css.noData}>Không có dữ liệu</Text>}
                         numColumns={2}
                     />
                 }

@@ -32,6 +32,7 @@ export default class Categories extends React.Component{
                     Toast.show('Đã làm mới danh mục ',  {duration: 500})
                 }
             })
+            .catch(error => console.warn(error))
     }
 
     onRefresh() {

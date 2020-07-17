@@ -5,6 +5,7 @@ import Toast from "react-native-tiny-toast";
 import AsyncStorage from '@react-native-community/async-storage'
 
 
+
 import Color from "../components/Color"
 import {UserContext} from "../contexts/UserProvider";
 
@@ -23,6 +24,7 @@ export default class Notification extends React.Component {
     async loadData() {
         try {
             const value = await AsyncStorage.getItem('userToken');
+            console.log('notification page get token: ' + value);
             if (value !== null) {
                 Axios.get('/get-notifications', {
                     headers: {
@@ -68,10 +70,10 @@ export default class Notification extends React.Component {
     }
 
     render() {
+        const {notifications, refreshing} = this.state;
         return (
             <UserContext.Consumer>
                 {({user}) => {
-                    const {notifications, refreshing} = this.state;
                     return (
                         <SafeAreaView style={styles.container}>
                             {user === null
