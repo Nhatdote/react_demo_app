@@ -37,6 +37,7 @@ const CartStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Cart" component={Cart} options={{title: 'Giỏ hàng'}}/>
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
     );
 };
@@ -45,42 +46,47 @@ const SearchStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Search" component={Search} options={{title: 'Tìm kiếm'}}/>
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
     );
 };
 
 const NotificationStack = () => {
     return (
-        <Stack.Navigator>
-            <Stack.Screen name="Notifications" component={Notification} options={{title: 'Thông báo'}}/>
-        </Stack.Navigator>
+        <UserContext.Consumer>
+            {({user}) => user === null 
+                ? LoginStack()  
+                : 
+                <Stack.Navigator>
+                    <Stack.Screen name="Notifications" component={Notification} options={{title: 'Thông báo'}}/>
+                </Stack.Navigator>
+            }
+        </UserContext.Consumer>
     );
 };
 
 const UserStack = () => {
     return (
         <UserContext.Consumer>
-            {({user}) => {
-                if (user !== null) {
-                    return (
-                        <Stack.Navigator>
-                            <Stack.Screen name="User" component={User} options={{title: 'Tài khoản'}}/>
-                        </Stack.Navigator>
-                    );
-                }else{
-                    return (
-                        <Stack.Navigator>
-                            <Stack.Screen name="Login" component={Login} options={{title: 'Đăng nhập'}}/>
-                            <Stack.Screen name="Register" component={Login} options={{title: 'Đăng ký'}}/>
-                        </Stack.Navigator>
-                    );
-                }
-            }}
+            {({user}) => user === null
+                ? LoginStack()
+                :
+                <Stack.Navigator>
+                    <Stack.Screen name="User" component={User} options={{title: 'Tài khoản'}}/>
+                </Stack.Navigator>
+            }
         </UserContext.Consumer>
     );
 };
 
-
+const LoginStack = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="Login" component={Login} options={{title: 'Đăng nhập'}}/>
+            <Stack.Screen name="Register" component={Login} options={{title: 'Đăng ký'}}/>
+        </Stack.Navigator>
+    );
+};
 
 
 function IconWithBadge({ name, badge, color, size }) {

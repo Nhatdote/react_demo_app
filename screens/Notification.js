@@ -24,7 +24,6 @@ export default class Notification extends React.Component {
     async loadData() {
         try {
             const value = await AsyncStorage.getItem('userToken');
-            console.log('notification page get token: ' + value);
             if (value !== null) {
                 Axios.get('/get-notifications', {
                     headers: {
