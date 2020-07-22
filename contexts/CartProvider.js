@@ -1,17 +1,7 @@
 import React from 'react'
-import Storage from 'react-native-storage'
 import AsyncStorage from '@react-native-community/async-storage'
-import Toast from "react-native-tiny-toast"
-
-const storage = new Storage({
-    size: 1000,
-    storageBackend: AsyncStorage,
-    defaultExpires: 0,
-    enableCache: true,
-    sync: {
-        // we'll talk about the details later.
-    }
-});
+import Toast from "react-native-tiny-toast";
+import Axios from "axios";
 
 export const CartContext = React.createContext();
 
@@ -20,6 +10,7 @@ export class CartProvider extends React.Component {
         super(props);
         this.state = {
             cart: [],
+            checkingOut: false
         };
         this.addToCart = this.addToCart.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
@@ -87,7 +78,8 @@ export class CartProvider extends React.Component {
             rate: product.rate,
             image: product.image,
             shop_id: product.shop_id,
-            shop_name: product.shop_name
+            shop_name: product.shop_name,
+            shop_type: product.shop_type
         };
 
         if (cart === []) {
@@ -119,10 +111,35 @@ export class CartProvider extends React.Component {
         });
     }
 
+    total = () =>  {
+        return this.state.cart.reduce((sum, item) => sum + item.total * item.rate, 0);
+    };
+
+    checkout = async () => {
+        const {cart} = this.state;
+        this.setState({checkingOut: true});
+        Axios.post('/cart-checkout', {
+            cart: JSON.stringify(cart)
+        })
+            .then(res => {
+                console.log(res.data);
+                if (res.data.status === 1) {
+
+                }else{
+                    Toast.show(res.data.msg);
+                }
+            })
+            .catch(error => console.warn(error))
+            .then(() => this.setState({checkingOut: false}));
+    };
+
     render() {
         return (
             <CartContext.Provider value={{
                 cart: this.state.cart,
+                checkingOut: this.state.checkingOut,
+                total: this.total,
+                checkout: this.checkout,
                 addToCart: this.addToCart,
                 removeFromCart: this.removeFromCart
             }}>

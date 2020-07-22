@@ -28,7 +28,11 @@ export class UserProvider extends React.Component {
     }
 
     loginToken = (token) => {
-        Axios.get('/check-token?token='+token)
+        Axios.get('/check-token', {
+            headers: {
+                Authorization: 'Bearer' + token
+            }
+        })
             .then(res => {
                 if (res.data.status === 1) {
                     this.setState({user: res.data.data});

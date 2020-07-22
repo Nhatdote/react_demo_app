@@ -43,7 +43,7 @@ export default class Login extends React.Component {
                 <UserContext.Consumer>
                     {({handleLogin, logging}) => {
                         return (
-                            <Button mode="contained" icon="chevron-double-right" loading={logging} style={styles.loginButton} onPress={() => handleLogin(username, password)}>
+                            <Button mode="contained" icon="chevron-double-right" loading={logging} disabled={logging} style={styles.loginButton} onPress={() => handleLogin(username, password)}>
                                 Login
                             </Button>
                         );
