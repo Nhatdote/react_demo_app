@@ -7,7 +7,7 @@ import Color from "./Color";
 import {CartContext} from "../contexts/CartProvider";
 
 export default function CartItem(props) {
-    const { shop, addToCart } = props;
+    const { shop } = props;
     return (
         <SafeAreaView style={ styles.container }>
             <View style={{paddingBottom: 5, backgroundColor: Color.secondary, width: '100%'}}>
@@ -22,6 +22,7 @@ export default function CartItem(props) {
                         />
                         <View style={styles.productInfo}>
                             <Text numberOfLines={1}>{item.name}</Text>
+                            <Text style={{color: 'red', fontSize: 10}}>{item.invalid ? 'Sản phẩm này hiện không còn được bán nữa' : ''}</Text>
                             <View style={{flexDirection: 'row', whiteSpace: 'space-between'}}>
                                 <Text style={{color: Color.muted}}>{numberFormat(item.sale_price * item.rate) + ' đ'}</Text>
                                 <Text style={{color: 'tomato', flexGrow: 1, textAlign: 'right'}}><Feather name="dollar-sign" />{numberFormat(item.total * item.rate) + ' đ'}</Text>

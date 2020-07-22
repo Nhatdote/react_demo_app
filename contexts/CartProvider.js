@@ -115,19 +115,50 @@ export class CartProvider extends React.Component {
         return this.state.cart.reduce((sum, item) => sum + item.total * item.rate, 0);
     };
 
+    checkProductInvalid = () => {
+        let {cart} = this.state;
+        let invalid = 0;
+        cart = cart.map(item => {
+            if (item.invalid) {
+                invalid++;
+            }
+            return item;
+        });
+        return invalid;
+    };
+
     checkout = async () => {
-        const {cart} = this.state;
+        let {cart} = this.state;
+        let checkProductInvalid = this.checkProductInvalid();
+        if (checkProductInvalid > 0){
+            Toast.show('Vui lòng xóa sản phẩm không hợp lệ trong giỏ hàng!');
+            return;
+        }
+        const token = await AsyncStorage.getItem('userToken');
+        if (token === null) {
+            Toast.show('Vui lòng đăng nhập để thanh toán');
+            return;
+        }
         this.setState({checkingOut: true});
         Axios.post('/cart-checkout', {
             cart: JSON.stringify(cart)
         })
-            .then(res => {
-                console.log(res.data);
+            .then(async res => {
                 if (res.data.status === 1) {
 
                 }else{
-                    Toast.show(res.data.msg);
+                    if (typeof res.data.invalid !== "undefined") {
+                        cart = cart.map(item => {
+                            if (res.data.invalid.indexOf(item.id) !== -1) {
+                                item.invalid = 1;
+                            }
+                            return item;
+                        });
+                        await this._storeData(cart);
+                        console.log('Done!');
+                    }
                 }
+                Toast.show(res.data.msg);
             })
             .catch(error => console.warn(error))
             .then(() => this.setState({checkingOut: false}));

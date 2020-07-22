@@ -4,6 +4,10 @@ import Toast from "react-native-tiny-toast"
 import Axios from "axios"
 import AsyncStorage from '@react-native-community/async-storage'
 
+const LocalUrl = 'http://192.168.3.28/api';
+const ServerUrl = 'https://tieudunghuutri.com/api';
+Axios.defaults.baseURL = LocalUrl;
+
 export const UserContext = React.createContext();
 
 export class UserProvider extends React.Component {
@@ -15,15 +19,14 @@ export class UserProvider extends React.Component {
             logging: false
         };
         this.handleLogin = this.handleLogin.bind(this);
-        this._getData = this._getData.bind(this);
     }
 
     async componentDidMount() {
         //this._removeData();
         const token = await this._getData();
         if (token) {
+            this.setState({token: token});
             this.loginToken(token);
-            this.setState({token: token})
         }
     }
 
@@ -98,7 +101,8 @@ export class UserProvider extends React.Component {
                     if (res.data.status === 1) {
                         await this._storeData(res.data.data.token);
                         this.setState({
-                            user: res.data.data,
+                            token: res.data.data.token,
+                            user: res.data.data
                         });
                         Toast.showSuccess(res.data.msg, {
                             position: 0,
@@ -118,7 +122,7 @@ export class UserProvider extends React.Component {
 
     handleLogout = async () => {
         await this._removeData();
-        this.setState({
+        await this.setState({
             token: null,
             user: null
         });
@@ -126,6 +130,12 @@ export class UserProvider extends React.Component {
     };
 
     render() {
+        const {token} = this.state;
+        if (token) {
+            Axios.defaults.headers.common['Authorization'] = 'Bearer' + token;
+        }else{
+            Axios.defaults.headers.common['Authorization'] = null;
+        }
         return (
             <UserContext.Provider value={{
                 handleLogin: this.handleLogin,
