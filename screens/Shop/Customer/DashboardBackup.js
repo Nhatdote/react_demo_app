@@ -1,19 +1,6 @@
+/*
 import React from 'react';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import {
-    SafeAreaView,
-    View,
-    Text,
-    ScrollView,
-    StyleSheet,
-    Dimensions,
-    ImageBackground,
-    Linking,
-    TouchableOpacity,
-    ActivityIndicator,
-    RefreshControl,
-    FlatList
-} from 'react-native';
+import {SafeAreaView, View, Text, ScrollView, StyleSheet, Dimensions, ImageBackground, Linking, TouchableOpacity, ActivityIndicator, RefreshControl} from 'react-native';
 import {Button, Avatar, Title, Paragraph} from "react-native-paper";
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import HTML from 'react-native-render-html';
@@ -22,18 +9,19 @@ import Axios from "axios";
 import Style from "../../../js/style";
 import Color from "../../../components/Color";
 import Toast from "react-native-tiny-toast";
-import ProductItem from "../../../components/ProductItem";
-
-const Tab = createMaterialTopTabNavigator();
 
 const initState = {
+    index: 0,
+    routes: [
+        { key: 'first', title: 'Tổng quan' },
+        { key: 'second', title: 'Sản phẩm' },
+    ],
     shop: null,
     refreshing: false,
-    readyData: false,
-    products: []
+    readyData: false
 };
 
-export default class Dashboard extends React.Component {
+export default class Dashboard extends React.Component{
     constructor(props) {
         super(props);
         this.state = initState;
@@ -42,27 +30,33 @@ export default class Dashboard extends React.Component {
     componentDidMount() {
         const {navigation, route} = this.props;
         const {id} = route.params;
-        navigation.setOptions({
-            headerRight: () => <Button uppercase={false} onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
-        });
+
         Axios.get('/shop-view/'+id+'/dashboard')
             .then(res => {
-                this.setState({
-                    readyData: true,
-                    shop: res.data.shop,
-                    products: res.data.products
-                });
-                navigation.setOptions({
-                    headerTitle: res.data.name
-                });
+                if (res.data.status === 1) {
+                    this.setState({
+                        readyData: true,
+                        shop: res.data.data
+                    });
+                    navigation.setOptions({
+                        headerTitle: res.data.data.name
+                    });
+                }else{
+                    Toast.show('Đã xảy ra lỗi trong quá trình tải dữ liệu shop');
+                }
             })
             .catch(error => console.warn(error));
 
-        // Axios.get('/shop-view/'+id+'/products')
-        //     .then(res => {
-        //         this.setState({products: res.data});
-        //     })
-        //     .catch(error => console.warn(error));
+        Axios.get('/shop-view/'+id+'/products')
+            .then(res => {
+                //console.log(res.data);
+                if (res.data.status === 1) {
+                    Toast.show('lay du lieu thanh cong');
+                }else{
+                    Toast.show('Đã xảy ra lỗi trong quá trình tải dữ liệu sản phẩm');
+                }
+            })
+            .catch(error => console.warn(error));
     }
 
     openUrl = (url) => {
@@ -76,13 +70,13 @@ export default class Dashboard extends React.Component {
         }).catch(error => console.warn('Không thể open Link___', error));
     };
 
-    dashboard = () => {
+    FirstRoute = () => {
         const {shop, refreshing} = this.state;
         return (
             <ScrollView
-                // refreshControl={
-                //     <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
-                // }
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
+                }
             >
                 <SafeAreaView style={Style.container}>
                     <ImageBackground source={shop.banner ? {uri: 'shop.banner'} : null} style={styles.shopBannerImage}>
@@ -135,38 +129,43 @@ export default class Dashboard extends React.Component {
                 </SafeAreaView>
             </ScrollView>
         );
+        
     };
 
-    products = () => {
-        const {products} = this.state;
-        const {navigation} = this.props;
+    SecondRoute = () => {
         return (
             <SafeAreaView>
-                <FlatList
-                    // refreshControl={
-                    //     <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
-                    // }
-                    columnWrapperStyle={styles.flatWrapper}
-                    data={products}
-                    renderItem={({ item }) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
-                        productId: item.id
-                    })} /></View>}
-                    keyExtractor={(item) => `${item.id}`}
-                    ListEmptyComponent={() => <Text style={Style.noData}>Không có dữ liệu</Text>}
-                    numColumns={2}
-                />
+                <View style={Style.card}>
+                    <Text style={{textAlign: 'center', fontWeight: 'bold', color: Color.secondary, marginBottom: 15, fontSize: 20}}>Tất cả sản phẩm</Text>
+                </View>
             </SafeAreaView>
         );
     };
 
-    onRefresh = async () => {
-        await this.setState({refreshing: true});
-        console.log(this.state.refreshing);
-        Toast.show('Refreshing...');
+    handleChangeTab = (index) => {
+        const {navigation} = this.props;
+        this.setState({index: index});
+        {index === 1
+            ? navigation.setOptions({
+                headerRight: () => <Button onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
+            })
+            :  navigation.setOptions({
+                headerRight: () => {}
+            })
+        }
     };
 
-    render(){
-        const {shop, readyData} = this.state;
+    onRefresh() {
+        this.setState({refreshing: true});
+        //this.setState(initState);
+    };
+
+    render() {
+        const renderScene = SceneMap({
+            first: this.FirstRoute,
+            second: this.SecondRoute,
+        });
+        const {index, routes, shop, readyData, refreshing} = this.state;
 
         if (!readyData) {
             return (
@@ -174,20 +173,29 @@ export default class Dashboard extends React.Component {
                     <ActivityIndicator size="large" />
                 </SafeAreaView>
             );
+        }else{
+            return (
+                <SafeAreaView style={{flex: 1, justifyContent: 'center'}}>
+                    {!shop
+                        ? <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Cửa hàng không tồn tại hoặc đã ngừng hoạt động </Text>
+                        : (
+                            <TabView
+                                onSwipeStart={() => Toast.show('drag...')}
+                                style={{color: 'red', backgroundColor: 'red'}}
+                                navigationState={{ index, routes }}
+                                renderScene={renderScene}
+                                onIndexChange={index => this.handleChangeTab(index)}
+                                initialLayout={initialLayout}
+                            />
+                        )
+                    }
+                </SafeAreaView>
+            );
         }
-
-        if (!shop) {
-            return <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Cửa hàng không tồn tại hoặc đã ngừng hoạt động </Text>;
-        }
-        return (
-            <Tab.Navigator>
-                <Tab.Screen name="Dashboard" component={this.dashboard} options={{title: 'Tổng quan'}} />
-                <Tab.Screen name="Products" component={this.products} options={{title: 'Sản phẩm'}} />
-            </Tab.Navigator>
-        );
     }
-
 }
+
+const initialLayout = { width: Dimensions.get('window').width};
 
 const styles = StyleSheet.create({
     shopBannerImage: {
@@ -212,11 +220,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         padding: 2
     },
-    flatWrapper: {
-        paddingHorizontal: 3,
-        paddingVertical: 3
-    },
-    flatProduct: {
-        flex: 1
-    },
 });
+
+
+*/

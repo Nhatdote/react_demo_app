@@ -14,5 +14,14 @@ export default StyleSheet.create({
         color: 'red',
         textAlign: 'center',
         marginTop: 100
+    },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        shadowColor: '#cdcdcd',
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        padding: 10,
+        margin: 10
     }
 });

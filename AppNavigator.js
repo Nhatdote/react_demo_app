@@ -28,7 +28,7 @@ const HomeStack = () => {
             <Stack.Screen name="Categories" component={Categories} options={{title: 'Trang chủ'}} />
             <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm', headerBackTitle: ' '}}/>
             <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
-            <Stack.Screen name="ShopView" component={ShopView} options={{title: 'Cửa hàng'}} />
+            <Stack.Screen name="ShopView" component={ShopView} options={{headerTitle: 'Cửa hàng', headerBackTitle: ' '}} />
         </Stack.Navigator>
     );
 };

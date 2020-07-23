@@ -22,6 +22,10 @@ export default class Products extends React.Component {
     }
 
     loadData(refresh = false) {
+        let loading = null;
+        if (refresh) {
+            loading = Toast.show('Đang làm mới...', {duration: 5000});
+        }
         Axios.get('/product/list/'+this.props.route.params.category.id)
             .then(res => {
                 this.setState({
@@ -30,6 +34,7 @@ export default class Products extends React.Component {
                     readyData: true
                 });
                 if (refresh) {
+                    Toast.hide(loading);
                     Toast.show('Đã làm mới sản phẩm', {duration: 500})
                 }
             })

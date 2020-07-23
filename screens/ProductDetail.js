@@ -10,7 +10,7 @@ import {
     ActivityIndicator, Dimensions, RefreshControl, ScrollView
 } from 'react-native'
 import {SimpleLineIcons} from '@expo/vector-icons'
-import {Button, Card, Paragraph, Chip} from 'react-native-paper'
+import {Button, Card, Paragraph, Chip, Avatar} from 'react-native-paper'
 
 
 import {numberFormat} from "../js/main";
@@ -34,6 +34,10 @@ export default class ProductDetail extends React.Component{
     }
 
     loadData(refresh = false) {
+        let loading = null;
+        if (refresh) {
+            loading = Toast.show('Đang làm mới...', {duration: 5000});
+        }
         const {route} = this.props;
         const {productId} = route.params;
         Axios.get('/product/'+productId)
@@ -44,6 +48,7 @@ export default class ProductDetail extends React.Component{
                     readyData: true
                 });
                 if (refresh) {
+                    Toast.hide(loading);
                     Toast.show('Đã làm mới sản phẩm', {duration: 500});
                 }
             })
@@ -99,12 +104,15 @@ export default class ProductDetail extends React.Component{
                         </View>
                         <View style={styles.container}>
                             <View style={{flexDirection: 'row'}}>
-                                <Image source={{uri: 'https://tieudunghuutri.com/'+product.shop.avatar}} style={{width: 70, height: 70, borderRadius: 50, marginRight: 10}} />
+                                {product.shop.avatar
+                                    ? <Avatar.Image size={66} style={{backgroundColor: 'transparent', marginRight: 10}} source={{uri: 'https://tieudunghuutri.com/' + product.shop.avatar}} />
+                                    : <Avatar.Text size={66} label={product.shop.name.split(' ').map(item => item.slice(0,1)).join('').slice(0, 2).toUpperCase()} color={'#fff'} style={{backgroundColor: 'tomato', marginRight: 10}}/>
+                                }
                                 <View>
                                     <Text numberOfLines={1} style={{fontSize: 20, color: Color.primary, width: Dimensions.get('window').width - 120}}>{product.shop.name}</Text>
                                     <Text style={{color: Color.muted}}><SimpleLineIcons name="screen-smartphone"/> {product.shop.phone_st}</Text>
                                     {/*<Button title="Xem Shop" color={Color.secondary} onPress={() => Alert.alert('123')} />*/}
-                                    <Button icon="chevron-double-right" mode="contained" onPress={() => navigation.navigate('ShopView')}>
+                                    <Button icon="chevron-double-right" mode="contained" onPress={() => navigation.navigate('ShopView', {id: product.shop_id})}>
                                         Xem Shop
                                     </Button>
                                 </View>

@@ -21,6 +21,10 @@ export default class Categories extends React.Component{
     }
 
     loadData(refresh = false) {
+        let loading = null;
+        if (refresh) {
+            loading = Toast.show('Đang làm mới...', {duration: 5000});
+        }
         Axios.get('/get-categories')
             .then(async res => {
                 await this.setState({
@@ -29,6 +33,7 @@ export default class Categories extends React.Component{
                     readyData: true
                 });
                 if (refresh) {
+                    Toast.hide(loading);
                     Toast.show('Đã làm mới danh mục ',  {duration: 500})
                 }
             })
