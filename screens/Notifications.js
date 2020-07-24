@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import Color from "../components/Color"
 import {UserContext} from "../contexts/UserProvider";
 
-export default class Notification extends React.Component {
+export default class Notifications extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

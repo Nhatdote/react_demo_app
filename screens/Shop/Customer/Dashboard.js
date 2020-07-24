@@ -1,25 +1,12 @@
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import {
-    SafeAreaView,
-    View,
-    Text,
-    ScrollView,
-    StyleSheet,
-    Dimensions,
-    ImageBackground,
-    Linking,
-    TouchableOpacity,
-    ActivityIndicator,
-    RefreshControl,
-    FlatList
-} from 'react-native';
+import {SafeAreaView, View, Text, ScrollView, StyleSheet, Dimensions, ImageBackground, Linking, TouchableOpacity, ActivityIndicator, RefreshControl, FlatList, Alert} from 'react-native';
 import {Button, Avatar, Title, Paragraph} from "react-native-paper";
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import HTML from 'react-native-render-html';
 import Axios from "axios";
 
-import Style from "../../../js/style";
+import Style from "../../../js/Style";
 import Color from "../../../components/Color";
 import Toast from "react-native-tiny-toast";
 import ProductItem from "../../../components/ProductItem";
@@ -28,9 +15,10 @@ const Tab = createMaterialTopTabNavigator();
 
 const initState = {
     shop: null,
-    refreshing: false,
     readyData: false,
-    products: []
+    products: [],
+    current_page: 1,
+    last_page: 1
 };
 
 export default class Dashboard extends React.Component {
@@ -40,17 +28,27 @@ export default class Dashboard extends React.Component {
     }
 
     componentDidMount() {
+        this._loadData();
+    }
+
+    _loadData = async () => {
         const {navigation, route} = this.props;
         const {id} = route.params;
-        navigation.setOptions({
-            headerRight: () => <Button uppercase={false} onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
-        });
-        Axios.get('/shop-view/'+id+'/dashboard')
+        if (typeof route.state !== "undefined") {
+            if (route.state.index === 1) {
+                navigation.setOptions({
+                    headerRight: () => <Button onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
+                });
+            }else{
+                navigation.setOptions({
+                    headerRight: () => {}
+                })
+            }
+        }
+        await Axios.get('/shop-view/'+id+'/dashboard')
             .then(res => {
                 this.setState({
-                    readyData: true,
-                    shop: res.data.shop,
-                    products: res.data.products
+                    shop: res.data,
                 });
                 navigation.setOptions({
                     headerTitle: res.data.name
@@ -58,12 +56,20 @@ export default class Dashboard extends React.Component {
             })
             .catch(error => console.warn(error));
 
-        // Axios.get('/shop-view/'+id+'/products')
-        //     .then(res => {
-        //         this.setState({products: res.data});
-        //     })
-        //     .catch(error => console.warn(error));
-    }
+        await Axios.get('/shop-view/'+id+'/products')
+            .then(res => {
+                this.setState({
+                    products: res.data.data,
+                    current_page: res.data.current_page,
+                    last_page: res.data.last_page
+                });
+            })
+            .catch(error => console.warn(error));
+        this.setState({
+            readyData: true,
+            refreshing: false
+        })
+    };
 
     openUrl = (url) => {
         Linking.canOpenURL(url).then(supported => {
@@ -77,15 +83,12 @@ export default class Dashboard extends React.Component {
     };
 
     dashboard = () => {
-        const {shop, refreshing} = this.state;
+        const {shop} = this.state;
+
         return (
-            <ScrollView
-                // refreshControl={
-                //     <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
-                // }
-            >
+            <ScrollView>
                 <SafeAreaView style={Style.container}>
-                    <ImageBackground source={shop.banner ? {uri: 'shop.banner'} : null} style={styles.shopBannerImage}>
+                    <ImageBackground source={shop.banner ? {uri: shop.banner} : null} style={styles.shopBannerImage}>
                         <View style={styles.shopAvatarWrap}>
                             {shop.avatar
                                 ? <Avatar.Image size={66} style={{backgroundColor: 'transparent'}} source={{uri: shop.avatar}} />
@@ -93,28 +96,34 @@ export default class Dashboard extends React.Component {
                             }
                         </View>
                     </ImageBackground>
-                    <View style={{marginBottom: 20}}>
+                    <View>
                         <Text style={{fontWeight: 'bold', textAlign: 'center', fontSize: 24}}>{shop.name.toUpperCase()}</Text>
                         <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity onPress={() => this.openUrl('tel:024141414512')}>
-                                <Button mode={'contained'} color={Color.info} style={{paddingVertical: 0, marginHorizontal: 5}} uppercase={false}><Feather name="smartphone" /> Gọi</Button>
-                            </TouchableOpacity>
+                            <Button mode="contained" uppercase={false}
+                                    style={{height: 25, width: 140, borderRadius: 30, justifyContent: 'center', marginHorizontal: 10}}
+                                    labelStyle={{fontSize: 12, paddingBottom: 3}}
+                                    onPress={() => this.openUrl('tel:024141414512')}>
+                                <Feather name="smartphone" /> Gọi
+                            </Button>
                             {shop.latitude && shop.longitude
-                                ? <TouchableOpacity onPress={() => this.openUrl(`https://google.com.vn/maps/dir/?api=1&destination=${shop.latitude}, ${shop.longitude}`)}>
-                                    <Button mode={'contained'} color={Color.purple} style={{paddingVertical: 0, marginHorizontal: 5}} uppercase={false}><Feather name="map-pin" /> Chỉ đường</Button>
-                                </TouchableOpacity>
+                                ? <Button mode="contained" uppercase={false} color={Color.info}
+                                          style={{height: 25, width: 140, borderRadius: 30, justifyContent: 'center', marginHorizontal: 10}}
+                                          labelStyle={{fontSize: 12, paddingBottom: 3}}
+                                          onPress={() => this.openUrl(`https://google.com.vn/maps/dir/?api=1&destination=${shop.latitude}, ${shop.longitude}`)}>
+                                    <Feather name="map-pin" /> Chỉ đường
+                                </Button>
                                 : <Text></Text>
                             }
                         </View>
                     </View>
                     <View style={Style.card}>
-                        <Text style={{textAlign: 'center', fontWeight: 'bold', color: Color.secondary, marginBottom: 15, fontSize: 20}}>{shop.name.toUpperCase()}</Text>
+                        <Title style={{textAlign: 'center', color: Color.secondary}}>{shop.name.toUpperCase()}</Title>
                         <Text style={{paddingVertical: 5}}><Feather name="map-pin" /> {shop.full_address}</Text>
                         <Text style={{paddingVertical: 5}}><Feather name="smartphone" /> {shop.phone_st}</Text>
 
                         {shop.facebook
                             ? <TouchableOpacity onPress={() => this.openUrl(shop.facebook)}>
-                                <Text style={{paddingVertical: 5, color: Color.blue}}><MaterialCommunityIcons name="facebook-box" /> Facebook {shop.facebook}</Text>
+                                <Text style={{paddingVertical: 5, color: Color.blue}}><MaterialCommunityIcons name="facebook-box" /> Facebook: {shop.facebook}</Text>
                             </TouchableOpacity>
                             : <Text></Text>
                         }
@@ -126,7 +135,7 @@ export default class Dashboard extends React.Component {
                         }
                     </View>
                     <View style={Style.card}>
-                        <Text style={{textAlign: 'center', fontWeight: 'bold', color: Color.secondary, marginBottom: 15, fontSize: 20}}>Giới thiệu về Shop 2</Text>
+                        <Title style={{textAlign: 'center', color: Color.secondary}}>{'Giới thiệu'}</Title>
                         {shop.description
                             ? <HTML html={shop.description} imagesMaxWidth={Dimensions.get('window').width - 40} />
                             : <Text style={{textAlign: 'center', paddingVertical: 10, color: Color.muted}}>{'Shop chưa thêm giới thiệu về shop'}</Text>
@@ -138,17 +147,16 @@ export default class Dashboard extends React.Component {
     };
 
     products = () => {
-        const {products} = this.state;
+        const {products, current_page, last_page} = this.state;
         const {navigation} = this.props;
+
         return (
             <SafeAreaView>
                 <FlatList
-                    // refreshControl={
-                    //     <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
-                    // }
-                    columnWrapperStyle={styles.flatWrapper}
+                    ListHeaderComponent={() => <Text style={{textAlign: 'right', marginHorizontal: 6}}>Trang {current_page}/{last_page}</Text>}
+                    style={{margin: 10}}
                     data={products}
-                    renderItem={({ item }) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
+                    renderItem={({ item }) => <View style={{flex: 1, marginBottom: 6}}><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
                         productId: item.id
                     })} /></View>}
                     keyExtractor={(item) => `${item.id}`}
@@ -159,14 +167,21 @@ export default class Dashboard extends React.Component {
         );
     };
 
-    onRefresh = async () => {
-        await this.setState({refreshing: true});
-        console.log(this.state.refreshing);
-        Toast.show('Refreshing...');
-    };
-
     render(){
         const {shop, readyData} = this.state;
+        const {route, navigation} = this.props;
+
+        if (typeof route.state !== "undefined") {
+            if (route.state.index === 1) {
+                navigation.setOptions({
+                    headerRight: () => <Button onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
+                });
+            }else{
+                navigation.setOptions({
+                    headerRight: () => {}
+                })
+            }
+        }
 
         if (!readyData) {
             return (

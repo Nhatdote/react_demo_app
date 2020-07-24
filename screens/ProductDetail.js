@@ -7,17 +7,26 @@ import {
     View,
     Alert,
     TouchableOpacity,
-    ActivityIndicator, Dimensions, RefreshControl, ScrollView
+    ActivityIndicator,
+    Dimensions,
+    RefreshControl,
+    ScrollView,
+    FlatList
 } from 'react-native'
 import {SimpleLineIcons} from '@expo/vector-icons'
-import {Button, Card, Paragraph, Chip, Avatar} from 'react-native-paper'
+import {Button, Card, Paragraph, Chip, Avatar, Title, Subheading, Caption, List} from 'react-native-paper'
+import Axios from "axios";
+import Toast from "react-native-tiny-toast";
+import Accordion from 'react-native-collapsible/Accordion';
+import HTML from 'react-native-render-html';
+
 
 
 import {numberFormat} from "../js/main";
 import Color from "../components/Color"
 import {CartContext} from "../contexts/CartProvider";
-import Axios from "axios";
-import Toast from "react-native-tiny-toast";
+import Style from "../js/Style";
+import ProductItem from "../components/ProductItem";
 
 export default class ProductDetail extends React.Component{
     constructor(props) {
@@ -25,7 +34,9 @@ export default class ProductDetail extends React.Component{
         this.state = {
             product: null,
             refreshing: false,
-            readyData: false
+            readyData: false,
+            relatedProducts: [],
+            activeSections: []
         }
     }
 
@@ -43,7 +54,8 @@ export default class ProductDetail extends React.Component{
         Axios.get('/product/'+productId)
             .then(res => {
                 this.setState({
-                    product: res.data,
+                    product: res.data.product,
+                    relatedProducts: res.data.relatedProducts,
                     refreshing: false,
                     readyData: true
                 });
@@ -60,26 +72,42 @@ export default class ProductDetail extends React.Component{
         this.loadData(true);
     }
 
+    _updateSections = activeSections => {
+        this.setState({ activeSections });
+    };
+
     render() {
-        const {product, refreshing, readyData} = this.state;
+        const {product, refreshing, readyData, relatedProducts} = this.state;
         const {navigation} = this.props;
         navigation.setOptions({
             title: product !== null ? product.name : 'Chi tiết sản phẩm'
         });
+        const sections = [
+            {
+                title: 'Tô tả sản phẩm',
+                content: product !== null ? product.description : 'Không có mô tả cho sản phẩm này',
+            },
+            {
+                title: 'Thông tin chi tiết',
+                content: product !== null && product.content !== null ? product.content : '<p style="color: #989898">Không có thông tin chi tiết cho sản phẩm này</p>',
+            },
+        ];
         return (
-            <SafeAreaView style={{flex: 1, justifyContent: 'center'}}>
+            <SafeAreaView style={Style.container}>
                 {!readyData
                     ?
-                    <ActivityIndicator size="large" />
+                    <View style={{flex: 1, justifyContent: 'center'}}>
+                        <ActivityIndicator size="large" />
+                    </View>
                     :
                     <ScrollView
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
                         }
                     >
-                        <View style={styles.container}>
+                        <View style={Style.card}>
                             <Text style={styles.title}>{product.name}</Text>
-                            <View style={styles.detail}>
+                            <View style={{flexDirection: 'row'}}>
                                 <Image style={styles.avatar} source={{uri: product.image}} />
                                 <View style={styles.info}>
                                     <Text>Thương hiệu: <Text style={styles.textSecondary}>{product.brand}</Text></Text>
@@ -88,7 +116,7 @@ export default class ProductDetail extends React.Component{
                                     <Text style={styles.price}>{numberFormat(product.sale_price * product.rate) + ' đ'}</Text>
                                 </View>
                             </View>
-                            <View style={styles.actions}>
+                            <View>
                                 <CartContext.Consumer>
                                     { ({addToCart}) => {
                                         return (
@@ -101,8 +129,18 @@ export default class ProductDetail extends React.Component{
                                     }}
                                 </CartContext.Consumer>
                             </View>
+                            <View style={{marginTop: 10}}>
+                                <Accordion
+                                    underlayColor={"whitesmoke"}
+                                    sections={sections}
+                                    activeSections={this.state.activeSections}
+                                    renderHeader={section => <Subheading style={{paddingVertical: 10}}>{section.title}</Subheading>}
+                                    renderContent={section => <View style={{padding: 5, backgroundColor: 'whitesmoke'}}><HTML html={section.content} imagesMaxWidth={Dimensions.get('window').width - 50} /></View>}
+                                    onChange={this._updateSections}
+                                />
+                            </View>
                         </View>
-                        <View style={styles.container}>
+                        <View style={Style.card}>
                             <View style={{flexDirection: 'row'}}>
                                 {product.shop.avatar
                                     ? <Avatar.Image size={66} style={{backgroundColor: 'transparent', marginRight: 10}} source={{uri: 'https://tieudunghuutri.com/' + product.shop.avatar}} />
@@ -111,12 +149,26 @@ export default class ProductDetail extends React.Component{
                                 <View>
                                     <Text numberOfLines={1} style={{fontSize: 20, color: Color.primary, width: Dimensions.get('window').width - 120}}>{product.shop.name}</Text>
                                     <Text style={{color: Color.muted}}><SimpleLineIcons name="screen-smartphone"/> {product.shop.phone_st}</Text>
-                                    {/*<Button title="Xem Shop" color={Color.secondary} onPress={() => Alert.alert('123')} />*/}
-                                    <Button icon="chevron-double-right" mode="contained" onPress={() => navigation.navigate('ShopView', {id: product.shop_id})}>
+                                    <Button icon="chevron-double-right" mode="contained" uppercase={false}
+                                            style={{height: 25, width: 120, borderRadius: 30, justifyContent: 'center'}}
+                                            labelStyle={{fontSize: 12, paddingBottom: 3}}
+                                            onPress={() => navigation.navigate('ShopView', {id: product.shop_id})}>
                                         Xem Shop
                                     </Button>
                                 </View>
                             </View>
+                        </View>
+                        <View style={{marginHorizontal: 10}}>
+                            <Title style={{textAlign: 'center'}}>Sản phẩm liên quan</Title>
+                            <FlatList
+                                data={relatedProducts}
+                                renderItem={({ item }) => <View style={{flex: 1, marginBottom: 6}}><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
+                                    productId: item.id
+                                })} /></View>}
+                                keyExtractor={(item) => `${item.id}`}
+                                ListEmptyComponent={() => <Text style={Style.noData}>Không có dữ liệu</Text>}
+                                numColumns={2}
+                            />
                         </View>
                     </ScrollView>
                 }
@@ -127,19 +179,6 @@ export default class ProductDetail extends React.Component{
 
 
 const styles = StyleSheet.create({
-    container: {
-        margin: 10,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        backgroundColor: '#fff',
-        borderRadius: 3,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-    },
-    detail: {
-        flexDirection: 'row',
-    },
     info: {
         marginLeft: 10,
         flex: 1
@@ -163,9 +202,6 @@ const styles = StyleSheet.create({
     },
     textSecondary: {
         color: Color.secondary
-    },
-    actions: {
-        margin: 10
     },
     addToCartBtn: {
         flexDirection: 'row',

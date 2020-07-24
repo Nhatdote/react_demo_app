@@ -9,7 +9,7 @@ import Products from "./screens/Products"
 import ProductDetail from "./screens/ProductDetail"
 import Cart from "./screens/Cart"
 import Search from "./screens/Search"
-import Notification from "./screens/Notification"
+import Notifications from "./screens/Notifications"
 import User from "./screens/User"
 import Login from "./screens/Login";
 import ShopView from "./screens/Shop/Customer/Dashboard";
@@ -58,7 +58,7 @@ const NotificationStack = () => {
                 ? LoginStack()  
                 : 
                 <Stack.Navigator>
-                    <Stack.Screen name="Notifications" component={Notification} options={{title: 'Thông báo'}}/>
+                    <Stack.Screen name="Notifications" component={Notifications} options={{title: 'Thông báo'}}/>
                 </Stack.Navigator>
             }
         </UserContext.Consumer>

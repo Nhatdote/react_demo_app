@@ -7,6 +7,7 @@ import Axios from "axios";
 import Color from "../components/Color";
 import {numberFormat} from "../js/main";
 import ProductItem from "../components/ProductItem";
+import Style from "../js/Style";
 
 const initState = {
     search: '',
@@ -58,9 +59,9 @@ export default class Search extends React.Component{
         const {search, results, readyData} = this.state;
         return (
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
-                <SafeAreaView style={styles.container}>
+                <SafeAreaView style={Style.container}>
                     <View style={styles.searchWrap}>
-                        <AntDesign style={{top: 12, left: 8, color: '#c1c1c1'}} name="search1" size={16}/>
+                        <AntDesign style={{top: 12, left: 14, color: '#c1c1c1'}} name="search1" size={16}/>
                         <TextInput
                             style={styles.searchBox}
                             onChangeText={search => this.handleSearch(search)}
@@ -72,9 +73,9 @@ export default class Search extends React.Component{
                             <ActivityIndicator size="large" />
                         </View>
                         : <FlatList
-                            columnWrapperStyle={styles.flatWrapper}
+                            style={{marginHorizontal: 10}}
                             data={results}
-                            renderItem={({item}) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
+                            renderItem={({item}) => <View style={{flex: 1, marginBottom: 6}}><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
                                 productId: item.id
                             })} /></View>}
                             keyExtractor={item => `${item.id}`}
@@ -93,30 +94,15 @@ export default class Search extends React.Component{
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        backgroundColor: 'whitesmoke',
-        paddingVertical: 10
-    },
     searchWrap: {
-        marginHorizontal: 6,
+        margin: 13,
         backgroundColor: '#fff',
         flexDirection: 'row',
-        borderRadius: 10,
-        marginBottom: 10
+        borderRadius: 30,
     },
     searchBox: {
         height: 40,
-        paddingHorizontal: 14,
+        paddingHorizontal: 20,
         flexGrow: 1
     },
-    flatProduct: {
-        flex: 1
-    },
-    flatWrapper: {
-        paddingHorizontal: 3,
-        paddingVertical: 3
-    }
 });

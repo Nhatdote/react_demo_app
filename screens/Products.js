@@ -5,7 +5,7 @@ import Toast from "react-native-tiny-toast";
 
 import ProductItem from "../components/ProductItem";
 import Color from "../components/Color";
-import css from "../js/style";
+import Style from "../js/Style";
 
 export default class Products extends React.Component {
     constructor(props) {
@@ -55,22 +55,23 @@ export default class Products extends React.Component {
         });
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Style.container}>
                 {!readyData
-                    ?
-                    <ActivityIndicator size="large" />
-                    :
-                    <FlatList
+                    ? <View style={{flex: 1, justifyContent: 'center'}}>
+                        <ActivityIndicator size="large" />
+                    </View>
+
+                    : <FlatList
+                        style={{margin: 10}}
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
                         }
-                        columnWrapperStyle={styles.flatWrapper}
                         data={products}
-                        renderItem={({ item }) => <View style={styles.flatProduct}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
+                        renderItem={({ item }) => <View style={{flex: 1, marginBottom: 6}}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
                             productId: item.id
                         })} /></View>}
                         keyExtractor={(item) => `${item.id}`}
-                        ListEmptyComponent={() => <Text style={css.noData}>Không có dữ liệu</Text>}
+                        ListEmptyComponent={() => <Text style={Style.noData}>Không có dữ liệu</Text>}
                         numColumns={2}
                     />
                 }
@@ -78,24 +79,3 @@ export default class Products extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center"
-    },
-    noProduct: {
-        fontSize: 24,
-        fontWeight: '100',
-        color: Color.muted,
-        textAlign: 'center',
-        marginTop: 100
-    },
-    flatProduct: {
-        flex: 1
-    },
-    flatWrapper: {
-        paddingHorizontal: 3,
-        paddingVertical: 3
-    }
-});
