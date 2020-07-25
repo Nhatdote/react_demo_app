@@ -1,7 +1,7 @@
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {SafeAreaView, View, Text, ScrollView, StyleSheet, Dimensions, ImageBackground, Linking, TouchableOpacity, ActivityIndicator, RefreshControl, FlatList, Alert} from 'react-native';
-import {Button, Avatar, Title, Paragraph} from "react-native-paper";
+import {Button, Avatar, Title, Paragraph, Caption} from "react-native-paper";
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import HTML from 'react-native-render-html';
 import Axios from "axios";
@@ -47,22 +47,30 @@ export default class Dashboard extends React.Component {
         }
         await Axios.get('/shop-view/'+id+'/dashboard')
             .then(res => {
-                this.setState({
-                    shop: res.data,
-                });
-                navigation.setOptions({
-                    headerTitle: res.data.name
-                });
+                if (res.data.status === 1) {
+                    this.setState({
+                        shop: res.data,
+                    });
+                    navigation.setOptions({
+                        headerTitle: res.data.name
+                    });
+                }else{
+                    console.warn(res.data.msg);
+                }
             })
             .catch(error => console.warn(error));
 
         await Axios.get('/shop-view/'+id+'/products')
             .then(res => {
-                this.setState({
-                    products: res.data.data,
-                    current_page: res.data.current_page,
-                    last_page: res.data.last_page
-                });
+                if(res.data.status === 1) {
+                    this.setState({
+                        products: res.data.data,
+                        current_page: res.data.current_page,
+                        last_page: res.data.last_page
+                    });
+                }else{
+                    console.warn(res.data.msg);
+                }
             })
             .catch(error => console.warn(error));
         this.setState({
@@ -84,7 +92,6 @@ export default class Dashboard extends React.Component {
 
     dashboard = () => {
         const {shop} = this.state;
-
         return (
             <ScrollView>
                 <SafeAreaView style={Style.container}>
