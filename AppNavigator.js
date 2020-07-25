@@ -1,41 +1,63 @@
 import React from 'react'
-import {Image, StyleSheet, View, Text} from 'react-native'
+import {Image, StyleSheet, View, Text, Dimensions, StatusBar, SafeAreaView} from 'react-native'
 import { createStackNavigator } from "@react-navigation/stack"
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs"
 import { AntDesign } from '@expo/vector-icons';
 
+import Color from "./components/Color";
 import Categories from "./screens/Categories"
 import Products from "./screens/Products"
 import ProductDetail from "./screens/ProductDetail"
 import Cart from "./screens/Cart"
 import Search from "./screens/Search"
-import Notifications from "./screens/Notifications"
-import User from "./screens/User"
+import Notifications from "./screens/Notifications";
+import NotificationDetail from "./screens/NotificationDetail";
 import Login from "./screens/Login";
 import ShopView from "./screens/Shop/Customer/Dashboard";
+import User from "./screens/User"
+import Dashboard from "./screens/Account/Dashboard";
+import History from "./screens/Account/History";
+import Order from "./screens/Account/Order";
+import UserInfo from "./screens/Account/UserInfo";
+import Store from "./screens/Account/Store";
+
 
 import {CartProvider} from "./contexts/CartProvider"
 import {CartContext} from "./contexts/CartProvider"
 import {AppProvider} from "./contexts/AppProvider"
 import {UserContext} from "./contexts/UserProvider";
 
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const screenOptions = () => {
+    return {
+        headerStyle: { backgroundColor: Color.secondary },
+        headerBackTitle: ' ',
+        headerTitleAlign: 'center',
+        headerTintColor: 'white'
+    }
+};
+
 const HomeStack = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            screenOptions={screenOptions()}
+        >
             <Stack.Screen name="Categories" component={Categories} options={{title: 'Trang chủ'}} />
-            <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm', headerBackTitle: ' '}}/>
-            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
-            <Stack.Screen name="ShopView" component={ShopView} options={{headerTitle: 'Cửa hàng', headerBackTitle: ' '}} />
+            <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm'}}/>
+            <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết'}} />
+            <Stack.Screen name="ShopView" component={ShopView} options={{headerTitle: 'Cửa hàng'}} />
         </Stack.Navigator>
     );
 };
 
 const CartStack = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            screenOptions={screenOptions()}
+        >
             <Stack.Screen name="Cart" component={Cart} options={{title: 'Giỏ hàng'}}/>
             <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
@@ -44,7 +66,9 @@ const CartStack = () => {
 
 const SearchStack = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            screenOptions={screenOptions()}
+        >
             <Stack.Screen name="Search" component={Search} options={{title: 'Tìm kiếm'}}/>
             <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết', headerBackTitle: ' '}} />
         </Stack.Navigator>
@@ -57,8 +81,11 @@ const NotificationStack = () => {
             {({user}) => user === null 
                 ? LoginStack()  
                 : 
-                <Stack.Navigator>
+                <Stack.Navigator
+                    screenOptions={screenOptions()}
+                >
                     <Stack.Screen name="Notifications" component={Notifications} options={{title: 'Thông báo'}}/>
+                    <Stack.Screen name="NotificationDetail" component={NotificationDetail} options={{title: 'Chi tiết thông báo', headerBackTitle: ' '}}/>
                 </Stack.Navigator>
             }
         </UserContext.Consumer>
@@ -71,8 +98,15 @@ const UserStack = () => {
             {({user}) => user === null
                 ? LoginStack()
                 :
-                <Stack.Navigator>
+                <Stack.Navigator
+                    screenOptions={screenOptions()}
+                >
                     <Stack.Screen name="User" component={User} options={{title: 'Tài khoản'}}/>
+                    <Stack.Screen name="Store" component={Store} options={{title: 'Tài khoản'}}/>
+                    <Stack.Screen name="Dashboard" component={Dashboard} options={{title: 'Tài khoản'}}/>
+                    <Stack.Screen name="History" component={History} options={{title: 'Tài khoản'}}/>
+                    <Stack.Screen name="Order" component={Order} options={{title: 'Tài khoản'}}/>
+                    <Stack.Screen name="UserInfo" component={UserInfo} options={{title: 'Tài khoản'}}/>
                 </Stack.Navigator>
             }
         </UserContext.Consumer>
@@ -81,7 +115,9 @@ const UserStack = () => {
 
 const LoginStack = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            screenOptions={screenOptions()}
+        >
             <Stack.Screen name="Login" component={Login} options={{title: 'Đăng nhập'}}/>
             <Stack.Screen name="Register" component={Login} options={{title: 'Đăng ký'}}/>
         </Stack.Navigator>
@@ -100,7 +136,7 @@ function IconWithBadge({ name, badge, color, size }) {
                         position: 'absolute',
                         right: -6,
                         top: -3,
-                        backgroundColor: 'red',
+                        backgroundColor: Color.secondary,
                         borderRadius: 10,
                         paddingHorizontal: 4,
                         justifyContent: 'center',
@@ -122,8 +158,10 @@ function HomeIconWithBadge(props) {
 }
 
 const AppNavigator = () => {
+
     return (
         <AppProvider>
+            <StatusBar barStyle="light-content" backgroundColor={Color.secondary} />
             <Tab.Navigator
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ color, size }) => {
@@ -156,10 +194,10 @@ const AppNavigator = () => {
                                 }}
                             </CartContext.Consumer>
                         );
-                    },
+                    }
                 })}
                 tabBarOptions={{
-                    activeTintColor: 'tomato',
+                    activeTintColor: Color.secondary,
                     inactiveTintColor: 'gray',
                 }}
             >
@@ -172,9 +210,5 @@ const AppNavigator = () => {
         </AppProvider>
     );
 };
-
-const styles = StyleSheet.create({
-
-});
 
 export default AppNavigator;

@@ -150,8 +150,8 @@ export default class ProductDetail extends React.Component{
                                     <Text numberOfLines={1} style={{fontSize: 20, color: Color.primary, width: Dimensions.get('window').width - 120}}>{product.shop.name}</Text>
                                     <Text style={{color: Color.muted}}><SimpleLineIcons name="screen-smartphone"/> {product.shop.phone_st}</Text>
                                     <Button icon="chevron-double-right" mode="contained" uppercase={false}
-                                            style={{height: 25, width: 120, borderRadius: 30, justifyContent: 'center'}}
-                                            labelStyle={{fontSize: 12, paddingBottom: 3}}
+                                            style={{height: 30, width: 120, borderRadius: 30, justifyContent: 'center'}}
+                                            labelStyle={{fontSize: 10, paddingBottom: 3}}
                                             onPress={() => navigation.navigate('ShopView', {id: product.shop_id})}>
                                         Xem Shop
                                     </Button>

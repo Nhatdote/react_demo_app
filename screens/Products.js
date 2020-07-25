@@ -1,5 +1,5 @@
 import React from 'react'
-import {ActivityIndicator, RefreshControl, StyleSheet, View, Text, SafeAreaView, FlatList} from "react-native";
+import {ActivityIndicator, RefreshControl, StyleSheet, View, Text, SafeAreaView, FlatList, StatusBar} from "react-native";
 import Axios from "axios";
 import Toast from "react-native-tiny-toast";
 

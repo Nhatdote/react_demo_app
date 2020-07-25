@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 
 const LocalUrl = 'http://192.168.3.28/api';
 const ServerUrl = 'https://tieudunghuutri.com/api';
-Axios.defaults.baseURL = ServerUrl;
+Axios.defaults.baseURL = LocalUrl;
 
 export const UserContext = React.createContext();
 
@@ -16,7 +16,8 @@ export class UserProvider extends React.Component {
         this.state = {
             token: null,
             user: null,
-            logging: false
+            logging: false,
+            countNotify: 0
         };
         this.handleLogin = this.handleLogin.bind(this);
     }
@@ -27,8 +28,24 @@ export class UserProvider extends React.Component {
         if (token) {
             this.setState({token: token});
             this.loginToken(token);
+            this.setCountNotify();
         }
     }
+
+    setCountNotify = (clear = null) => {
+        if (!clear) {
+            const url = '/notification/count';
+        }else{
+            const url = 'notification/count?clear=1';
+        }
+        Axios.get('/notification/count')
+            .then(res => {
+                if (res.data.status === 1) {
+                    this.setState({countNotify: res.data.data});
+                }
+            })
+            .catch(error => console.warn(error));
+    };
 
     loginToken = (token) => {
         Axios.get('/check-token', {
@@ -142,7 +159,9 @@ export class UserProvider extends React.Component {
                 handleLogout: this.handleLogout,
                 token: this.state.token,
                 user: this.state.user,
-                logging: this.state.logging
+                logging: this.state.logging,
+                countNotify: this.state.countNotify,
+                setCountNotify: this.setCountNotify
             }}>
                 {this.props.children}
             </UserContext.Provider>

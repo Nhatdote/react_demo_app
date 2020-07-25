@@ -1,6 +1,22 @@
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import {SafeAreaView, View, Text, ScrollView, StyleSheet, Dimensions, ImageBackground, Linking, TouchableOpacity, ActivityIndicator, RefreshControl, FlatList, Alert} from 'react-native';
+import {
+    SafeAreaView,
+    View,
+    Text,
+    ScrollView,
+    StyleSheet,
+    Dimensions,
+    ImageBackground,
+    Linking,
+    TouchableOpacity,
+    ActivityIndicator,
+    RefreshControl,
+    FlatList,
+    Alert,
+    Modal,
+    TouchableHighlight
+} from 'react-native';
 import {Button, Avatar, Title, Paragraph, Caption} from "react-native-paper";
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import HTML from 'react-native-render-html';
@@ -18,7 +34,8 @@ const initState = {
     readyData: false,
     products: [],
     current_page: 1,
-    last_page: 1
+    last_page: 1,
+    displayFilter: false
 };
 
 export default class Dashboard extends React.Component {
@@ -34,25 +51,17 @@ export default class Dashboard extends React.Component {
     _loadData = async () => {
         const {navigation, route} = this.props;
         const {id} = route.params;
-        if (typeof route.state !== "undefined") {
-            if (route.state.index === 1) {
-                navigation.setOptions({
-                    headerRight: () => <Button onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
-                });
-            }else{
-                navigation.setOptions({
-                    headerRight: () => {}
-                })
-            }
-        }
+        navigation.setOptions({
+            headerRight: () => {}
+        });
         await Axios.get('/shop-view/'+id+'/dashboard')
             .then(res => {
                 if (res.data.status === 1) {
                     this.setState({
-                        shop: res.data,
+                        shop: res.data.data,
                     });
                     navigation.setOptions({
-                        headerTitle: res.data.name
+                        headerTitle: res.data.data.name
                     });
                 }else{
                     console.warn(res.data.msg);
@@ -64,9 +73,9 @@ export default class Dashboard extends React.Component {
             .then(res => {
                 if(res.data.status === 1) {
                     this.setState({
-                        products: res.data.data,
-                        current_page: res.data.current_page,
-                        last_page: res.data.last_page
+                        products: res.data.data.data,
+                        current_page: res.data.data.current_page,
+                        last_page: res.data.data.last_page
                     });
                 }else{
                     console.warn(res.data.msg);
@@ -107,17 +116,17 @@ export default class Dashboard extends React.Component {
                         <Text style={{fontWeight: 'bold', textAlign: 'center', fontSize: 24}}>{shop.name.toUpperCase()}</Text>
                         <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                             <Button mode="contained" uppercase={false}
-                                    style={{height: 25, width: 140, borderRadius: 30, justifyContent: 'center', marginHorizontal: 10}}
-                                    labelStyle={{fontSize: 12, paddingBottom: 3}}
+                                    style={{height: 30, width: 140, borderRadius: 30, justifyContent: 'center', marginHorizontal: 10}}
+                                    labelStyle={{fontSize: 10, paddingBottom: 3}}
                                     onPress={() => this.openUrl('tel:024141414512')}>
-                                <Feather name="smartphone" /> Gọi
+                                <Feather name="smartphone" size={10} /> Gọi
                             </Button>
                             {shop.latitude && shop.longitude
                                 ? <Button mode="contained" uppercase={false} color={Color.info}
-                                          style={{height: 25, width: 140, borderRadius: 30, justifyContent: 'center', marginHorizontal: 10}}
-                                          labelStyle={{fontSize: 12, paddingBottom: 3}}
+                                          style={{height: 30, width: 140, borderRadius: 30, justifyContent: 'center', marginHorizontal: 10}}
+                                          labelStyle={{fontSize: 10, paddingBottom: 3}}
                                           onPress={() => this.openUrl(`https://google.com.vn/maps/dir/?api=1&destination=${shop.latitude}, ${shop.longitude}`)}>
-                                    <Feather name="map-pin" /> Chỉ đường
+                                    <Feather name="map-pin" size={10} /> Chỉ đường
                                 </Button>
                                 : <Text></Text>
                             }
@@ -154,7 +163,7 @@ export default class Dashboard extends React.Component {
     };
 
     products = () => {
-        const {products, current_page, last_page} = this.state;
+        const {products, current_page, last_page, displayFilter} = this.state;
         const {navigation} = this.props;
 
         return (
@@ -181,7 +190,7 @@ export default class Dashboard extends React.Component {
         if (typeof route.state !== "undefined") {
             if (route.state.index === 1) {
                 navigation.setOptions({
-                    headerRight: () => <Button onPress={() => alert('This is a button!')} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
+                    headerRight: () => <Button onPress={() => Toast.showSuccess('Bộc Lọc')} color={'#fff'} style={{marginRight: 10}}><AntDesign name="filter" size={16} />Lọc</Button>
                 });
             }else{
                 navigation.setOptions({
@@ -198,7 +207,7 @@ export default class Dashboard extends React.Component {
             );
         }
 
-        if (!shop) {
+        if (shop === null) {
             return <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Cửa hàng không tồn tại hoặc đã ngừng hoạt động </Text>;
         }
         return (
