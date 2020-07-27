@@ -3,6 +3,8 @@ import {SafeAreaView, Text, ScrollView, StyleSheet, Dimensions, Modal, View, Tou
 import {Title, Caption, FAB, Portal, Provider, Headline, Subheading, Button} from "react-native-paper";
 import Toast from "react-native-tiny-toast";
 import { AntDesign } from '@expo/vector-icons';
+import DatePicker from 'react-native-datepicker'
+
 
 import Style from "../../js/Style";
 import Color from "../../components/Color";
@@ -13,7 +15,9 @@ export default class History extends React.Component {
         this.state = {
             isOpen: false,
             loading: false,
-            modalVisible: false
+            modalVisible: false,
+            startTime: null,
+            endTime: null
         }
     }
 
@@ -38,7 +42,7 @@ export default class History extends React.Component {
                     <Subheading style={{textAlign: 'center'}}>Chọn loại lịch sử muốn xem</Subheading>
 
                     <Modal
-                        animationType="fade"
+                        animationType="slide"
                         transparent={true}
                         visible={modalVisible}
                         onRequestClose={() => {
@@ -47,7 +51,25 @@ export default class History extends React.Component {
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
-                                <Text style={styles.modalText}>Hello World! Hello World! Hello World! Hello World! Hello World!</Text>
+                                <Caption >Từ ngày</Caption>
+                                <DatePicker
+                                    style={{width: 300, marginBottom: 10, height: 40, borderRadius: 30}}
+                                    date={this.state.date}
+                                    mode="date"
+                                    androidMode="spinner"
+                                    placeholder="Chọn ngày"
+                                    format="YYYY-MM-DD"
+                                    minDate="2019-01-01"
+                                    maxDate="2020-07-27"
+                                    confirmBtnText="Chọn"
+                                    cancelBtnText="Hủy"
+                                    showIcon={false}
+                                    customStyles={{
+                                        borderRadius: 30
+                                        // ... You can check the source to find the other keys.
+                                    }}
+                                    onDateChange={(date) => {this.setState({date: date})}}
+                                />
 
                                 <TouchableHighlight
                                     style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
