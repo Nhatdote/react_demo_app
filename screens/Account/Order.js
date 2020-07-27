@@ -1,10 +1,15 @@
 import React from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import {SafeAreaView, Text, View} from 'react-native';
 
-export default class Order extends React.Component {
-    render() {
-        return (
-            <Text>Order Page</Text>
-        );
-    }
+
+
+function Order(props) {
+
+    return (
+        <SafeAreaView>
+            <Text>sdsd</Text>
+        </SafeAreaView>
+    );
 }
+
+export default Order;

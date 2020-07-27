@@ -9,5 +9,13 @@ export default {
     light: '#f8f9fa',
     dark: '#343a40',
     blue: '#007bff',
-    purple: '#7952b3'
+    purple: '#7952b3',
+    alert_blue: '#cce5ff',
+    alert_gray: '#e2e3e5',
+    alert_success: '#d4edda',
+    alert_danger: '#f8d7da',
+    alert_warning: '#fff3cd',
+    alert_info: '#d1ecf1',
+    alert_light: '#fefefe',
+    alert_dark: '#d6d8d9',
 };

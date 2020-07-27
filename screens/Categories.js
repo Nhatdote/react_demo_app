@@ -4,6 +4,8 @@ import Axios from 'axios'
 import Toast from "react-native-tiny-toast";
 
 import CategoryItem from '../components/CategoryItem'
+import {Caption} from "react-native-paper";
+import Constants from "../Constants";
 
 export default class Categories extends React.Component{
     constructor (props) {
@@ -63,6 +65,7 @@ export default class Categories extends React.Component{
                             category: item
                         })} />}
                         keyExtractor={(item) => `${item.id}`}
+                        ListFooterComponent={() => <Caption style={{textAlign: 'center', marginVertical: 15}}>{Constants.sologan}</Caption>}
                     />
                 }
             </SafeAreaView>

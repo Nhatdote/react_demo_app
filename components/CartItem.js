@@ -11,7 +11,7 @@ export default function CartItem(props) {
     return (
         <SafeAreaView style={ styles.container }>
             <View style={{paddingBottom: 5, backgroundColor: Color.secondary, width: '100%'}}>
-                <Text style={{color: '#fff', marginLeft: 10}}><FontAwesome5 name="store" size={14} color="#fff" /> {shop.shop_name}</Text>
+                <Text style={{color: '#fff', marginLeft: 10, marginTop: 4}}><FontAwesome5 name="store" size={14} color="#fff" /> {shop.shop_name}</Text>
             </View>
             {shop.products.map((item, index) => {
                 return (

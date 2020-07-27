@@ -8,6 +8,8 @@ import Color from "../components/Color";
 import {numberFormat} from "../js/main";
 import ProductItem from "../components/ProductItem";
 import Style from "../js/Style";
+import {Caption} from "react-native-paper";
+import Constants from "../Constants";
 
 const initState = {
     search: '',
@@ -73,17 +75,19 @@ export default class Search extends React.Component{
                             <ActivityIndicator size="large" />
                         </View>
                         : <FlatList
-                            style={{marginHorizontal: 10}}
+                            style={{padding: 5}}
                             data={results}
-                            renderItem={({item}) => <View style={{flex: 1, marginBottom: 6}}><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
+                            renderItem={({item}) => <ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
                                 productId: item.id
-                            })} /></View>}
+                            })} />}
                             keyExtractor={item => `${item.id}`}
                             ListEmptyComponent={search === ''
                                 ? () => <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Nhập từ khóa tìm kiếm</Text>
                                 : () => <Text style={{marginTop: 50, color: Color.muted, textAlign: 'center', fontSize: 24}}>Không tìm thấy dữ liệu</Text>
                             }
                             numColumns={2}
+                            ListFooterComponent={() => <Caption style={{textAlign: 'center', marginVertical: 15}}>{Constants.sologan}</Caption>}
+
                         />
                     }
                 </SafeAreaView>
@@ -95,7 +99,7 @@ export default class Search extends React.Component{
 
 const styles = StyleSheet.create({
     searchWrap: {
-        margin: 13,
+        margin: 10,
         backgroundColor: '#fff',
         flexDirection: 'row',
         borderRadius: 30,

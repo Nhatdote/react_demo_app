@@ -2,15 +2,18 @@ import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {SafeAreaView, View, Text, ScrollView, StyleSheet, Dimensions, ImageBackground, Linking, TouchableOpacity, ActivityIndicator, RefreshControl, FlatList, Alert, Modal, TouchableHighlight} from 'react-native';
 import {Button, Avatar, Title, Paragraph, Caption} from "react-native-paper";
-import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import HTML from 'react-native-render-html';
 import Axios from "axios";
 
+import Constants from "../../../Constants";
 import Style from "../../../js/Style";
 import Color from "../../../components/Color";
 import Toast from "react-native-tiny-toast";
 import ProductItem from "../../../components/ProductItem";
+import {UserContext} from "../../../contexts/UserProvider";
 import Shop from "../../../components/Shop";
+
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -24,22 +27,28 @@ const initState = {
 };
 
 export default class Dashboard extends React.Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props);
         this.state = initState;
     }
 
     componentDidMount() {
+        const {shop} = this.context;
+        this.setState({
+            shop: shop,
+        });
         this._loadData();
     }
 
     _loadData = async () => {
         const {navigation, route} = this.props;
-        const {id} = route.params;
+        const {user} = this.context;
         navigation.setOptions({
-            headerRight: () => {}
+            headerRight: () => <Button onPress={() => Toast.showSuccess('Sửa thông tin')} color={'#fff'} style={{marginRight: 10}}><Ionicons name="ios-cog" size={22} /></Button>
         });
-        await Axios.get('/shop-view/'+id+'/dashboard')
+
+        await Axios.get('/account/store')
             .then(res => {
                 if (res.data.status === 1) {
                     this.setState({
@@ -54,7 +63,7 @@ export default class Dashboard extends React.Component {
             })
             .catch(error => console.warn(error));
 
-        await Axios.get('/shop-view/'+id+'/products')
+        await Axios.get('/account/product/list')
             .then(res => {
                 if(res.data.status === 1) {
                     this.setState({
@@ -67,28 +76,21 @@ export default class Dashboard extends React.Component {
                 }
             })
             .catch(error => console.warn(error));
-        this.setState({
-            readyData: true,
-            refreshing: false
-        })
+        this.setState({readyData: true});
     };
 
-    dashboard = () => {
-        const {shop} = this.state;
-        return <Shop shop={shop} />
-    };
+    dashboard = () => <Shop shop={this.state.shop} />;
 
     products = () => {
         const {products, current_page, last_page, displayFilter} = this.state;
         const {navigation} = this.props;
-
         return (
             <SafeAreaView>
                 <FlatList
                     ListHeaderComponent={() => <Text style={{textAlign: 'right', marginHorizontal: 6}}>Trang {current_page}/{last_page}</Text>}
-                    style={{padding: 10}}
+                    style={{padding: 5}}
                     data={products}
-                    renderItem={({ item }) => <ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
+                    renderItem={({ item }) =><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
                         productId: item.id
                     })} />}
                     keyExtractor={(item) => `${item.id}`}
@@ -100,31 +102,29 @@ export default class Dashboard extends React.Component {
     };
 
     render(){
-        const {shop, readyData} = this.state;
+        const {shop, products, current_page, last_page, readyData} = this.state;
         const {route, navigation} = this.props;
 
         if (typeof route.state !== "undefined") {
             if (route.state.index === 1) {
                 navigation.setOptions({
-                    headerRight: () => <Button onPress={() => Toast.showSuccess('Bộc Lọc')} color={'#fff'} style={{marginRight: 5}}><AntDesign name="filter" size={16} />Lọc</Button>
+                    headerRight: () => <Button onPress={() => Toast.showSuccess('Thêm sản phẩm')} color={'#fff'} style={{marginRight: 10}}><Ionicons name="ios-add-circle-outline" size={22} /></Button>
                 });
             }else{
                 navigation.setOptions({
-                    headerRight: () => {}
+                    headerRight: () => <Button onPress={() => Toast.showSuccess('Sửa thông tin')} color={'#fff'} style={{marginRight: 10}}><Ionicons name="ios-cog" size={22} /></Button>
                 })
             }
         }
-
         if (!readyData) {
             return (
-                <SafeAreaView style={{flex:1, justifyContent: 'center'}}>
+                <View style={{flex: 1, justifyContent: 'center'}}>
                     <ActivityIndicator size="large" />
-                </SafeAreaView>
+                </View>
             );
         }
-
         if (shop === null) {
-            return <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Cửa hàng không tồn tại hoặc đã ngừng hoạt động </Text>;
+            return <Caption style={{textAlign: 'center', marginTop: 50}}>Cửa hàng không tồn tại hoặc đã ngừng hoạt động</Caption>;
         }
         return (
             <Tab.Navigator>
@@ -136,34 +136,4 @@ export default class Dashboard extends React.Component {
 
 }
 
-const styles = StyleSheet.create({
-    shopBannerImage: {
-        width: Dimensions.get('window').width,
-        height: 150,
-        marginBottom: 15,
-        backgroundColor: Color.purple
-    },
-    shopAvatarImage: {
-        width: 66,
-        height: 66,
-    },
-    shopAvatarWrap: {
-        width: 70,
-        height: 70,
-        position: 'absolute',
-        bottom: -15,
-        left: '50%',
-        transform: [{translateX: -35}],
-        backgroundColor: '#fff',
-        borderRadius: 50,
-        overflow: 'hidden',
-        padding: 2
-    },
-    flatWrapper: {
-        paddingHorizontal: 3,
-        paddingVertical: 3
-    },
-    flatProduct: {
-        flex: 1
-    },
-});
+

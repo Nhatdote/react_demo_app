@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import {StyleSheet, FlatList, Text, View, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Keyboard, TouchableHighlight} from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons';
+import Axios from "axios";
+
 
 import logo from "../images/logo.jpg"
 import {UserContext} from "../contexts/UserProvider"
@@ -20,16 +22,29 @@ export default class LoginView extends Component {
         super(props);
     }
 
+    componentDidMount() {
+        const {navigation} = this.props;
+        const {user} = this.context;
+        if (user !== null) {
+            navigation.setOptions({
+                headerTitle: user.name
+            })
+        }
+    }
+
     menu = () => {
-        const {handleLogout} = this.context;
-        const menu = [
-            {id: 1, title: 'Cửa hàng của tôi', icon: icon_store, navigate: 'Store'},
+        const {shop, handleLogout} = this.context;
+        let menu = [
+            {id: 1, title: 'Tạo Shop', icon: icon_store, navigate: 'CreateShop'},
             {id: 2, title: 'Thống kê', icon: icon_dashboard, navigate: 'Dashboard'},
             {id: 3, title: 'Lịch sử giao dịch', icon: icon_history, navigate: 'History'},
             {id: 4, title: 'Đơn hàng', icon: icon_order, navigate: 'Order'},
             {id: 5, title: 'Thông tin tài khoản', icon: icon_user_info, navigate: 'UserInfo'},
             {id: 6, title: 'Đăng xuất', icon: icon_logout, onPress: handleLogout}
         ];
+        if (shop !== null) {
+            menu[0] = {id: 1, title: 'Shop của tôi', icon: icon_store, navigate: 'Store', params: {}};
+        }
         return menu;
     };
 
@@ -38,7 +53,7 @@ export default class LoginView extends Component {
         if (typeof item.onPress !== "undefined"){
             item.onPress();
         }else if (typeof item.navigate !== "undefined"){
-            navigation.navigate(item.navigate);
+            navigation.navigate(item.navigate, item.params);
         }else{
             Alert.alert('Không có hành động');
         }
@@ -47,7 +62,7 @@ export default class LoginView extends Component {
     renderItem = (item) => {
         const {navigation} = this.props;
         return (
-            <TouchableOpacity style={[Style.card, {flex: 1, alignItems: 'center'}]}
+            <TouchableOpacity style={[Style.card, {flex: 1, marginHorizontal: 5, marginVertical: 5, alignItems: 'center'}]}
                               onPress={() => this.handleMenuPress(item)}
             >
                 <Image style={{height: 40, width: 40, marginVertical: 25}} source={item.icon} />
@@ -57,14 +72,13 @@ export default class LoginView extends Component {
     };
 
     render() {
-        const {navigation} = this.props;
-        const {user, handleLogout} = this.context;
         const menu = this.menu();
 
         return (
             <SafeAreaView style={Style.container}>
                 <FlatList
                     ListHeaderComponent={() => <View style={{alignItems: 'center'}}><Image style={styles.logo} source={logo} /></View>}
+                    style={{marginHorizontal: 5}}
                     data={menu}
                     renderItem={({ item }) => this.renderItem(item)}
                     keyExtractor={item => `${item.id}`}

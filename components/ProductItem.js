@@ -1,12 +1,13 @@
 import React from 'react'
 import {StyleSheet, View, Text, Image, TouchableOpacity, Alert} from 'react-native'
-import {numberFormat} from '../js/main'
+import {numberFormat} from '../js/main';
+import Style from "../js/Style";
 
 export default function ProductItem(props) {
     const { product, onPress } = props;
     return (
-        <TouchableOpacity onPress={onPress}>
-            <View style={ styles.productItem }>
+        <TouchableOpacity onPress={onPress} style={{flex: 1}}>
+            <View style={[Style.card, {alignItems: 'center', margin: 5}]}>
                 <Text numberOfLines={2} style={ styles.title }>{ product.name }</Text>
                 <Image
                     style={ styles.img }
@@ -19,17 +20,6 @@ export default function ProductItem(props) {
 }
 
 const styles  = StyleSheet.create({
-    productItem: {
-        paddingVertical: 20,
-        paddingHorizontal: 5,
-        backgroundColor: 'white',
-        borderRadius: 3,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        alignItems: 'center',
-        marginHorizontal: 3,
-    },
     title: {
         textAlign: 'center',
         lineHeight: 16,

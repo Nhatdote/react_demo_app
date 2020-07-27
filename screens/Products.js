@@ -1,11 +1,13 @@
 import React from 'react'
 import {ActivityIndicator, RefreshControl, StyleSheet, View, Text, SafeAreaView, FlatList, StatusBar} from "react-native";
 import Axios from "axios";
+import {Caption} from "react-native-paper";
 import Toast from "react-native-tiny-toast";
 
 import ProductItem from "../components/ProductItem";
 import Color from "../components/Color";
 import Style from "../js/Style";
+import Constants from "../Constants";
 
 export default class Products extends React.Component {
     constructor(props) {
@@ -62,17 +64,18 @@ export default class Products extends React.Component {
                     </View>
 
                     : <FlatList
-                        style={{margin: 10}}
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
                         }
+                        style={{padding: 5}}
                         data={products}
-                        renderItem={({ item }) => <View style={{flex: 1, marginBottom: 6}}><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
+                        renderItem={({ item }) => <ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
                             productId: item.id
-                        })} /></View>}
+                        })} />}
                         keyExtractor={(item) => `${item.id}`}
                         ListEmptyComponent={() => <Text style={Style.noData}>Không có dữ liệu</Text>}
                         numColumns={2}
+                        ListFooterComponent={() => <Caption style={{textAlign: 'center', marginVertical: 15}}>{Constants.sologan}</Caption>}
                     />
                 }
             </SafeAreaView>

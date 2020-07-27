@@ -19,7 +19,8 @@ import Dashboard from "./screens/Account/Dashboard";
 import History from "./screens/Account/History";
 import Order from "./screens/Account/Order";
 import UserInfo from "./screens/Account/UserInfo";
-import Store from "./screens/Account/Store";
+import CreateShop from "./screens/Shop/Owner/Create";
+import ShopOwner from './screens/Shop/Owner/Dashboard';
 
 
 import {CartProvider} from "./contexts/CartProvider"
@@ -102,11 +103,13 @@ const UserStack = () => {
                     screenOptions={screenOptions()}
                 >
                     <Stack.Screen name="User" component={User} options={{title: 'Tài khoản'}}/>
-                    <Stack.Screen name="Store" component={Store} options={{title: 'Tài khoản'}}/>
-                    <Stack.Screen name="Dashboard" component={Dashboard} options={{title: 'Tài khoản'}}/>
-                    <Stack.Screen name="History" component={History} options={{title: 'Tài khoản'}}/>
-                    <Stack.Screen name="Order" component={Order} options={{title: 'Tài khoản'}}/>
-                    <Stack.Screen name="UserInfo" component={UserInfo} options={{title: 'Tài khoản'}}/>
+                    <Stack.Screen name="Store" component={ShopOwner} options={{title: 'Shop của tôi'}}/>
+                    <Stack.Screen name="CreateShop" component={CreateShop} options={{title: 'Tạo Shop'}}/>
+                    <Stack.Screen name="Dashboard" component={Dashboard} options={{title: 'Thống kê'}}/>
+                    <Stack.Screen name="History" component={History} options={{title: 'Lịch sử giao dịch'}}/>
+                    <Stack.Screen name="Order" component={Order} options={{title: 'Đơn hàng'}}/>
+                    <Stack.Screen name="UserInfo" component={UserInfo} options={{title: 'Thông tin tài khoản'}}/>
+                    <Stack.Screen name="ShopView" component={ShopView} options={{headerTitle: 'Cửa hàng'}} />
                 </Stack.Navigator>
             }
         </UserContext.Consumer>
@@ -184,15 +187,23 @@ const AppNavigator = () => {
                                 break;
                         }
                         return (
-                            <CartContext.Consumer>
-                                { ({cart}) => {
-                                    if (iconName === 'shoppingcart') {
-                                        return <HomeIconWithBadge name={iconName} size={size} color={color} badge={cart.length}/>
-                                    }else{
-                                        return <HomeIconWithBadge name={iconName} size={size} color={color}/>
-                                    }
+                            <UserContext.Consumer>
+                                {({countNotify}) => {
+                                    return (
+                                        <CartContext.Consumer>
+                                            { ({cart}) => {
+                                                if (iconName === 'shoppingcart') {
+                                                    return <HomeIconWithBadge name={iconName} size={size} color={color} badge={cart.length}/>
+                                                }else if(iconName === 'bells') {
+                                                    return <HomeIconWithBadge name={iconName} size={size} color={color} badge={countNotify}/>
+                                                }else{
+                                                    return <HomeIconWithBadge name={iconName} size={size} color={color}/>
+                                                }
+                                            }}
+                                        </CartContext.Consumer>
+                                    );
                                 }}
-                            </CartContext.Consumer>
+                            </UserContext.Consumer>
                         );
                     }
                 })}

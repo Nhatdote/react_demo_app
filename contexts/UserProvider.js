@@ -17,7 +17,7 @@ export class UserProvider extends React.Component {
             token: null,
             user: null,
             logging: false,
-            countNotify: 0
+            countNotify: 0,
         };
         this.handleLogin = this.handleLogin.bind(this);
     }
@@ -55,7 +55,9 @@ export class UserProvider extends React.Component {
         })
             .then(res => {
                 if (res.data.status === 1) {
-                    this.setState({user: res.data.data});
+                    this.setState({
+                        user: res.data.data,
+                    });
                     Toast.show(res.data.msg);
                 }else{
                     Toast.show(res.data.msg);
@@ -119,7 +121,7 @@ export class UserProvider extends React.Component {
                         await this._storeData(res.data.data.token);
                         this.setState({
                             token: res.data.data.token,
-                            user: res.data.data
+                            user: res.data.data,
                         });
                         Toast.showSuccess(res.data.msg, {
                             position: 0,
@@ -161,7 +163,7 @@ export class UserProvider extends React.Component {
                 user: this.state.user,
                 logging: this.state.logging,
                 countNotify: this.state.countNotify,
-                setCountNotify: this.setCountNotify
+                setCountNotify: this.setCountNotify,
             }}>
                 {this.props.children}
             </UserContext.Provider>

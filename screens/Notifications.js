@@ -9,6 +9,7 @@ import {UserContext} from "../contexts/UserProvider";
 import Color from "../components/Color"
 import Style from "../js/Style";
 import {Fontisto} from "@expo/vector-icons";
+import Constants from "../Constants";
 
 // React.useEffect(() => {
 //     const unsubscribe = navigation.addListener('tabPress', (e) => {
@@ -143,6 +144,7 @@ export default class Notifications extends React.Component {
                                     renderItem={({item}) => this.renderItem(item)}
                                     keyExtractor={item => `${item.id}`}
                                     ListEmptyComponent={() => <Text style={{color: Color.muted, textAlign: 'center', fontSize: 24}}>Không có thông báo</Text>}
+                                    ListFooterComponent={() => <Caption style={{textAlign: 'center', marginVertical: 15}}>{Constants.sologan}</Caption>}
                                 />
                             }
                         </SafeAreaView>
