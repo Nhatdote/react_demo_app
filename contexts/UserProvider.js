@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 
 const LocalUrl = 'http://192.168.3.28/api';
 const ServerUrl = 'https://tieudunghuutri.com/api';
-Axios.defaults.baseURL = ServerUrl;
+Axios.defaults.baseURL = LocalUrl;
 
 export const UserContext = React.createContext();
 
