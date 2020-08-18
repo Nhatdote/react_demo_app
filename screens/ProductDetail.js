@@ -13,23 +13,22 @@ import {
     ScrollView,
     FlatList
 } from 'react-native'
-import {SimpleLineIcons} from '@expo/vector-icons'
-import {Button, Card, Paragraph, Chip, Avatar, Title, Subheading, Caption, List} from 'react-native-paper'
+import { SimpleLineIcons, AntDesign } from '@expo/vector-icons'
+import { Button, Card, Paragraph, Chip, Avatar, Title, Subheading, Caption, List } from 'react-native-paper'
 import Axios from "axios";
 import Toast from "react-native-tiny-toast";
 import Accordion from 'react-native-collapsible/Accordion';
 import HTML from 'react-native-render-html';
 
 
-
-import {numberFormat} from "../js/main";
+import { numberFormat } from "../js/main";
 import Color from "../components/Color"
-import {CartContext} from "../contexts/CartProvider";
+import { CartContext } from "../contexts/CartProvider";
 import Style from "../js/Style";
 import ProductItem from "../components/ProductItem";
 import Constants from "../Constants";
 
-export default class ProductDetail extends React.Component{
+export default class ProductDetail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -48,11 +47,11 @@ export default class ProductDetail extends React.Component{
     loadData(refresh = false) {
         let loading = null;
         if (refresh) {
-            loading = Toast.show('Đang làm mới...', {duration: 5000});
+            loading = Toast.show('Đang làm mới...', { duration: 5000 });
         }
-        const {route} = this.props;
-        const {productId} = route.params;
-        Axios.get('/product/'+productId)
+        const { route } = this.props;
+        const { productId } = route.params;
+        Axios.get('/product/' + productId)
             .then(res => {
                 this.setState({
                     product: res.data.product,
@@ -62,14 +61,14 @@ export default class ProductDetail extends React.Component{
                 });
                 if (refresh) {
                     Toast.hide(loading);
-                    Toast.show('Đã làm mới sản phẩm', {duration: 500});
+                    Toast.show('Đã làm mới sản phẩm', { duration: 500 });
                 }
             })
             .catch(error => console.warn(error));
     }
 
     onRefresh() {
-        this.setState({refreshing: true});
+        this.setState({ refreshing: true });
         this.loadData(true);
     }
 
@@ -77,9 +76,9 @@ export default class ProductDetail extends React.Component{
         this.setState({ activeSections });
     };
 
-    renderDetail () {
-        const {product} = this.state;
-        const {navigation} = this.props;
+    renderDetail() {
+        const { product } = this.state;
+        const { navigation } = this.props;
         const sections = [
             {
                 title: 'Mô tả sản phẩm',
@@ -92,22 +91,33 @@ export default class ProductDetail extends React.Component{
         ];
         return (
             <View>
-                <View style={[Style.card, {marginHorizontal: 5}]}>
+                <View style={[Style.card, { marginHorizontal: 5 }]}>
                     <Text style={styles.title}>{product.name}</Text>
-                    <View style={{flexDirection: 'row'}}>
-                        <Image style={styles.avatar} source={{uri: Constants.base_url + product.image}} />
+                    <View style={{ flexDirection: 'row' }}>
+                        <Image style={styles.avatar} source={{ uri: Constants.base_url + product.image }} />
                         <View style={styles.info}>
                             <Text>Thương hiệu: <Text style={styles.textSecondary}>{product.brand}</Text></Text>
                             <Text>Nhà cung cấp: <Text style={styles.textSecondary}>{product.vendor}</Text></Text>
-                            <Text>Danh mục: <Text style={styles.textSecondary}>{product.child_category.name ? product.child_category.name : 'Chưa phân loại'}</Text></Text>
+                            <Text>Danh mục:  
+                                <Text style={styles.textSecondary}> {product.category.name} </Text>
+                                {product.sub_category
+                                    ? <Text style={styles.textSecondary}><AntDesign name="right" /> {product.sub_category.name} </Text>
+                                    : <Text></Text>
+                                }
+                                {product.child_category
+                                    ? <Text style={styles.textSecondary}><AntDesign name="right" /> {product.child_category.name} </Text>
+                                    : <Text></Text>
+                                }
+                            </Text>
+                            {/* <Text>Danh mục: <Text style={styles.textSecondary}>{product.child_category.name ? product.child_category.name : 'Chưa phân loại'}</Text></Text> */}
                             <Text style={styles.price}>{numberFormat(product.sale_price * Constants.token_rate) + ' đ'}</Text>
                         </View>
                     </View>
                     <View>
                         <CartContext.Consumer>
-                            { ({addToCart}) => {
+                            {({ addToCart }) => {
                                 return (
-                                    <View style={{marginTop: 8}}>
+                                    <View style={{ marginTop: 8 }}>
                                         <Button icon="cart" mode="contained" onPress={() => addToCart(product, 1)}>
                                             Thêm vào giỏ hàng
                                         </Button>
@@ -116,44 +126,46 @@ export default class ProductDetail extends React.Component{
                             }}
                         </CartContext.Consumer>
                     </View>
-                    <View style={{marginTop: 10}}>
+                    <View style={{ marginTop: 10 }}>
                         <Accordion
                             underlayColor={"whitesmoke"}
                             sections={sections}
                             activeSections={this.state.activeSections}
-                            renderHeader={section => <Subheading style={{paddingVertical: 10}}>{section.title}</Subheading>}
-                            renderContent={section => <View style={{padding: 5, backgroundColor: 'whitesmoke'}}><HTML html={section.content} imagesMaxWidth={Dimensions.get('window').width - 50} /></View>}
+                            renderHeader={section => <Subheading style={{ paddingVertical: 10 }}>{section.title}</Subheading>}
+                            renderContent={section => <View style={{ padding: 5, backgroundColor: 'whitesmoke' }}><HTML html={section.content} imagesMaxWidth={Dimensions.get('window').width - 50} /></View>}
                             onChange={this._updateSections}
                         />
                     </View>
                 </View>
-                <View style={[Style.card, {marginHorizontal: 5}]}>
-                    <View style={{flexDirection: 'row'}}>
+
+                {/* Shop box */}
+                <View style={[Style.card, { marginHorizontal: 5 }]}>
+                    <View style={{ flexDirection: 'row' }}>
                         {product.shop.avatar
-                            ? <Avatar.Image size={66} style={{backgroundColor: 'transparent', marginRight: 10}} source={{uri: 'https://tieudunghuutri.com/' + product.shop.avatar}} />
-                            : <Avatar.Text size={66} label={product.shop.name.split(' ').map(item => item.slice(0,1)).join('').slice(0, 2).toUpperCase()} color={'#fff'} style={{backgroundColor: 'tomato', marginRight: 10}}/>
+                            ? <Avatar.Image size={66} style={{ backgroundColor: 'transparent', marginRight: 10 }} source={{ uri: 'https://tieudunghuutri.com/' + product.shop.avatar }} />
+                            : <Avatar.Text size={66} label={product.shop.name.split(' ').map(item => item.slice(0, 1)).join('').slice(0, 2).toUpperCase()} color={'#fff'} style={{ backgroundColor: 'tomato', marginRight: 10 }} />
                         }
                         <View>
-                            <Text numberOfLines={1} style={{fontSize: 20, color: Color.primary, width: Dimensions.get('window').width - 120}}>{product.shop.name}</Text>
-                            <Text style={{color: Color.muted}}><SimpleLineIcons name="screen-smartphone"/> {product.shop.phone_st}</Text>
+                            <Text numberOfLines={1} style={{ fontSize: 20, color: Color.primary, width: Dimensions.get('window').width - 120 }}>{product.shop.name}</Text>
+                            <Text style={{ color: Color.muted }}><SimpleLineIcons name="screen-smartphone" /> {product.shop.phone_st}</Text>
                             <Button icon="chevron-double-right" mode="contained" uppercase={false}
-                                    style={{height: 30, width: 120, borderRadius: 30, justifyContent: 'center'}}
-                                    labelStyle={{fontSize: 10, paddingBottom: 3}}
-                                    onPress={() => navigation.navigate('ShopView', {id: product.shop_id})}>
+                                style={{ height: 30, width: 120, borderRadius: 30, justifyContent: 'center' }}
+                                labelStyle={{ fontSize: 10, paddingBottom: 3 }}
+                                onPress={() => navigation.navigate('ShopView', { id: product.shop_id })}>
                                 Xem Shop
                             </Button>
                         </View>
                     </View>
                 </View>
-                <Title style={{textAlign: 'center'}}>Sản phẩm liên quan</Title>
+                <Title style={{ textAlign: 'center' }}>Sản phẩm liên quan</Title>
             </View>
 
         );
     }
 
     render() {
-        const {product, refreshing, readyData, relatedProducts} = this.state;
-        const {navigation} = this.props;
+        const { product, refreshing, readyData, relatedProducts } = this.state;
+        const { navigation } = this.props;
 
         navigation.setOptions({
             title: product !== null ? product.name : 'Chi tiết sản phẩm'
@@ -162,7 +174,7 @@ export default class ProductDetail extends React.Component{
             <SafeAreaView style={Style.container}>
                 {!readyData
                     ?
-                    <View style={{flex: 1, justifyContent: 'center'}}>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
                         <ActivityIndicator size="large" />
                     </View>
                     :
@@ -170,16 +182,16 @@ export default class ProductDetail extends React.Component{
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={() => this.onRefresh()} />
                         }
-                        style={{padding: 5}}
+                        style={{ padding: 5 }}
                         ListHeaderComponent={() => this.renderDetail()}
                         data={relatedProducts}
-                        renderItem={({ item }) => <ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
+                        renderItem={({ item }) => <ProductItem product={item} onPress={() => navigation.push('ProductDetail', {
                             productId: item.id
                         })} />}
                         keyExtractor={(item) => `${item.id}`}
                         ListEmptyComponent={() => <Text style={Style.noData}>Không có dữ liệu</Text>}
                         numColumns={2}
-                        ListFooterComponent={() => <Caption style={{textAlign: 'center', marginVertical: 15}}>{Constants.sologan}</Caption>}
+                        ListFooterComponent={() => <Caption style={{ textAlign: 'center', marginVertical: 15 }}>{Constants.sologan}</Caption>}
                     />
                 }
             </SafeAreaView>
