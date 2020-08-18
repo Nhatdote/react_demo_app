@@ -75,7 +75,6 @@ export class CartProvider extends React.Component {
             sale_price: product.sale_price,
             quantity: qty,
             total: product.sale_price * qty,
-            rate: product.rate,
             image: product.image,
             shop_id: product.shop_id,
             shop_name: product.shop_name,
@@ -112,7 +111,7 @@ export class CartProvider extends React.Component {
     }
 
     total = () =>  {
-        return this.state.cart.reduce((sum, item) => sum + item.total * item.rate, 0);
+        return this.state.cart.reduce((sum, item) => sum + item.total, 0);
     };
 
     checkProductInvalid = () => {

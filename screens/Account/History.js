@@ -38,7 +38,7 @@ export default class History extends React.Component {
 
         return (
             <ScrollView>
-                <SafeAreaView style={[Style.container, {minHeight: height - 110}]}>
+                <SafeAreaView style={[Style.container, {minHeight: height - 130}]}>
                     <Subheading style={{textAlign: 'center'}}>Chọn loại lịch sử muốn xem</Subheading>
 
                     <Modal
@@ -86,6 +86,7 @@ export default class History extends React.Component {
                     <Provider>
                         <Portal>
                             <FAB.Group
+                                style={{bottom: 20}}
                                 open={isOpen}
                                 icon={isOpen ? 'playlist-remove' : 'format-list-bulleted-type'}
                                 actions={[

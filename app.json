@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Demo",
-    "slug": "Demo",
+    "name": "Tiêu dùng hưu trí",
+    "slug": "nhatdote-first-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-ios.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,10 +17,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.vnssoft.tieudunghuutri",
+      "buildNumber": "1.0.0"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
+    },
+    "android": {
+      "package": "com.vnssoft.tieudunghuutri",
+      "versionCode": 1
     }
   }
 }

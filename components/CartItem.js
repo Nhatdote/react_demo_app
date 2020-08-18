@@ -5,6 +5,7 @@ import { FontAwesome5, Feather } from '@expo/vector-icons'
 import {numberFormat} from '../js/main'
 import Color from "./Color";
 import {CartContext} from "../contexts/CartProvider";
+import Constants from '../Constants';
 
 export default function CartItem(props) {
     const { shop } = props;
@@ -18,14 +19,14 @@ export default function CartItem(props) {
                     <View  key={`${item.id}`} style={styles.productItem}>
                         <Image
                             style={styles.productImage}
-                            source={{uri: item.image}}
+                            source={{uri: Constants.base_url + item.image}}
                         />
                         <View style={styles.productInfo}>
                             <Text numberOfLines={1}>{item.name}</Text>
                             <Text style={{color: 'red', fontSize: 10}}>{item.invalid ? 'Sản phẩm này hiện không còn được bán nữa' : ''}</Text>
                             <View style={{flexDirection: 'row', whiteSpace: 'space-between'}}>
-                                <Text style={{color: Color.muted}}>{numberFormat(item.sale_price * item.rate) + ' đ'}</Text>
-                                <Text style={{color: 'tomato', flexGrow: 1, textAlign: 'right'}}><Feather name="dollar-sign" />{numberFormat(item.total * item.rate) + ' đ'}</Text>
+                                <Text style={{color: Color.muted}}>{numberFormat(item.sale_price * Constants.token_rate) + ' đ'}</Text>
+                                <Text style={{color: 'tomato', flexGrow: 1, textAlign: 'right'}}><Feather name="dollar-sign" />{numberFormat(item.total * Constants.token_rate) + ' đ'}</Text>
                             </View>
                             <CartContext.Consumer>
                                 { ({addToCart}) => {

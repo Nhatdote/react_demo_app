@@ -82,7 +82,7 @@ export default class ProductDetail extends React.Component{
         const {navigation} = this.props;
         const sections = [
             {
-                title: 'Tô tả sản phẩm',
+                title: 'Mô tả sản phẩm',
                 content: product !== null ? product.description : 'Không có mô tả cho sản phẩm này',
             },
             {
@@ -95,12 +95,12 @@ export default class ProductDetail extends React.Component{
                 <View style={[Style.card, {marginHorizontal: 5}]}>
                     <Text style={styles.title}>{product.name}</Text>
                     <View style={{flexDirection: 'row'}}>
-                        <Image style={styles.avatar} source={{uri: product.image}} />
+                        <Image style={styles.avatar} source={{uri: Constants.base_url + product.image}} />
                         <View style={styles.info}>
                             <Text>Thương hiệu: <Text style={styles.textSecondary}>{product.brand}</Text></Text>
                             <Text>Nhà cung cấp: <Text style={styles.textSecondary}>{product.vendor}</Text></Text>
                             <Text>Danh mục: <Text style={styles.textSecondary}>{product.child_category.name ? product.child_category.name : 'Chưa phân loại'}</Text></Text>
-                            <Text style={styles.price}>{numberFormat(product.sale_price * product.rate) + ' đ'}</Text>
+                            <Text style={styles.price}>{numberFormat(product.sale_price * Constants.token_rate) + ' đ'}</Text>
                         </View>
                     </View>
                     <View>

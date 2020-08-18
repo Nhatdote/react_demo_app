@@ -2,9 +2,10 @@ import React from 'react'
 import {Alert, Keyboard, SafeAreaView} from "react-native"
 import Toast from "react-native-tiny-toast"
 import Axios from "axios"
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-community/async-storage';
 
-const LocalUrl = 'http://192.168.3.28/api';
+
+const LocalUrl = 'http://192.168.1.130/api';
 const ServerUrl = 'https://tieudunghuutri.com/api';
 Axios.defaults.baseURL = ServerUrl;
 
@@ -18,6 +19,7 @@ export class UserProvider extends React.Component {
             user: null,
             logging: false,
             countNotify: 0,
+            readyData: false,
         };
         this.handleLogin = this.handleLogin.bind(this);
     }
@@ -30,6 +32,10 @@ export class UserProvider extends React.Component {
             this.loginToken(token);
             this.setCountNotify();
         }
+        setTimeout(() => {
+            this.setState({readyData: true});
+        }, 1000);
+    
     }
 
     setCountNotify = (clear = null) => {
@@ -149,7 +155,7 @@ export class UserProvider extends React.Component {
     };
 
     render() {
-        const {token} = this.state;
+        const {token, readyData} = this.state;
         if (token) {
             Axios.defaults.headers.common['Authorization'] = 'Bearer' + token;
         }else{

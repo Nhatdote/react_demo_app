@@ -17,7 +17,7 @@ const cartFooter = () => {
             {({total, checkout, checkingOut}) => {
                 return (
                     <View style={{marginHorizontal: 10, marginVertical: 10}}>
-                        <Text style={{textAlign: 'right', fontSize: 20, marginBottom: 10}}>Tổng tiền: {numberFormat(total())} đ</Text>
+                        <Text style={{textAlign: 'right', fontSize: 20, marginBottom: 10}}>Tổng tiền: {numberFormat(total() * Constants.token_rate)} đ</Text>
                         <Button icon={'chevron-double-right'} mode={'contained'} loading={checkingOut} disabled={checkingOut} onPress={() => checkout()}>Thanh toán</Button>
                     </View>
                 );

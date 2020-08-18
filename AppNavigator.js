@@ -5,7 +5,8 @@ import {createBottomTabNavigator} from "@react-navigation/bottom-tabs"
 import { AntDesign } from '@expo/vector-icons';
 
 import Color from "./components/Color";
-import Categories from "./screens/Categories"
+import Categories from "./screens/Categories";
+import Home from "./screens/Home";
 import Products from "./screens/Products"
 import ProductDetail from "./screens/ProductDetail"
 import Cart from "./screens/Cart"
@@ -46,7 +47,7 @@ const HomeStack = () => {
         <Stack.Navigator
             screenOptions={screenOptions()}
         >
-            <Stack.Screen name="Categories" component={Categories} options={{title: 'Trang chủ'}} />
+            <Stack.Screen name="Home" component={Home} options={{title: 'Trang chủ'}} />
             <Stack.Screen name="Products" component={Products} options={{title: 'Sản phẩm'}}/>
             <Stack.Screen name="ProductDetail" component={ProductDetail} options={{title: 'Sản phẩm chi tiết'}} />
             <Stack.Screen name="ShopView" component={ShopView} options={{headerTitle: 'Cửa hàng'}} />
@@ -109,7 +110,6 @@ const UserStack = () => {
                     <Stack.Screen name="History" component={History} options={{title: 'Lịch sử giao dịch'}}/>
                     <Stack.Screen name="Order" component={Order} options={{title: 'Đơn hàng'}}/>
                     <Stack.Screen name="UserInfo" component={UserInfo} options={{title: 'Thông tin tài khoản'}}/>
-                    <Stack.Screen name="ShopView" component={ShopView} options={{headerTitle: 'Cửa hàng'}} />
                 </Stack.Navigator>
             }
         </UserContext.Consumer>

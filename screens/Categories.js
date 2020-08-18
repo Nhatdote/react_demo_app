@@ -2,9 +2,10 @@ import React from 'react'
 import {RefreshControl, StyleSheet, SafeAreaView, Text, View, Alert, FlatList, ActivityIndicator, Image} from 'react-native'
 import Axios from 'axios'
 import Toast from "react-native-tiny-toast";
+import {Caption} from "react-native-paper";
+
 
 import CategoryItem from '../components/CategoryItem'
-import {Caption} from "react-native-paper";
 import Constants from "../Constants";
 
 export default class Categories extends React.Component{

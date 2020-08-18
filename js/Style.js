@@ -23,7 +23,8 @@ function Style() {
             shadowOpacity: 0.3,
             shadowRadius: 5,
             padding: 10,
-            margin: 10
+            margin: 10,
+            overflow: 'hidden'
         },
     })
 }

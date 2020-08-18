@@ -44,7 +44,7 @@ export default class Login extends React.Component {
                     {({handleLogin, logging}) => {
                         return (
                             <Button mode="contained" icon="chevron-double-right" loading={logging} disabled={logging} style={styles.loginButton} onPress={() => handleLogin(username, password)}>
-                                Login
+                                Đăng nhập
                             </Button>
                         );
                     }}
@@ -52,11 +52,11 @@ export default class Login extends React.Component {
 
 
                 <TouchableOpacity activeOpacity={0.6} style={styles.buttonContainer}>
-                    <Text>Forgot your password?</Text>
+                    <Text>Quên mật khẩu?</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity activeOpacity={0.6} style={styles.buttonContainer}>
-                    <Text>Register</Text>
+                    <Text>Đăng ký</Text>
                 </TouchableOpacity>
             </KeyboardAvoidingView>
         );

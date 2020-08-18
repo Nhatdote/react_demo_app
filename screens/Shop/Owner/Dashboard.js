@@ -90,7 +90,7 @@ export default class Dashboard extends React.Component {
                     ListHeaderComponent={() => <Text style={{textAlign: 'right', marginHorizontal: 6}}>Trang {current_page}/{last_page}</Text>}
                     style={{padding: 5}}
                     data={products}
-                    renderItem={({ item }) =><ProductItem product={ item } onPress={() => navigation.push('ProductDetail', {
+                    renderItem={({ item }) =><ProductItem product={ item } onPress={() => navigation.navigate('ProductDetail', {
                         productId: item.id
                     })} />}
                     keyExtractor={(item) => `${item.id}`}
