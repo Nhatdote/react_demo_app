@@ -39,7 +39,7 @@ export default function ProductItem(props) {
                         <Text style={styles.price}>{numberFormat(product.sale_price * Constants.token_rate) + 'đ'}</Text>
                         {discount > 0
                             ? <Text style={styles.rootPrice}>{numberFormat(product.price * Constants.token_rate) + 'đ'}</Text>
-                            : <Text></Text>
+                            : <Text style={styles.rootPrice}></Text>
                         }
                     </View>
                 </View>

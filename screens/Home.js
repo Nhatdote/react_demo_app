@@ -148,7 +148,7 @@ export default class Home extends React.Component {
     }
 
     render() {
-        const { banners, categoryProducts, readyData, refreshing } = this.state;
+        const { banners, readyData, refreshing } = this.state;
 
         if (!readyData) {
             return <View style={{ flex: 1, justifyContent: 'center' }}>
